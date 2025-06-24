@@ -78,7 +78,7 @@ class User {
         const [rows] = await pool.execute(`
             SELECT u.*, t.nome_tipo as nome_tipo_utilizador
             FROM utilizadores u
-            LEFT JOIN TiposUtilizador t ON u.id_tipo_utilizador = t.id_tipo_utilizador
+            LEFT JOIN tiposUtilizador t ON u.id_tipo_utilizador = t.id_tipo_utilizador
             WHERE u.email = ?
         `, [email]);
         return rows[0];

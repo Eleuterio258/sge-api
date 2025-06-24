@@ -14,15 +14,15 @@ async function unseedDatabase() {
         const tables = [
             "Pagamentos",
             "Parcelas",
-            "Aulas",
-            "Exames",
-            "Matriculas",
+            "aulas",
+            "exames",
+            "matriculas",
             "Escola_Utilizadores",
-            "Alunos",
+            "alunos",
             "utilizadores",
-            "Escolas",
-            "CategoriasCarta",
-            "TiposUtilizador"
+            "escolas",
+            "categoriascarta",
+            "tiposUtilizador"
         ];
 
         for (const table of tables) {

@@ -3,7 +3,7 @@
 		"_postman_id": "YOUR_POSTMAN_COLLECTION_ID",
 		"name": "SGE-Conducao API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"description": "Coleção Postman para testar a API do Sistema de Gestão Escolar (SGE) de Escolas de Condução."
+		"description": "Coleção Postman para testar a API do Sistema de Gestão Escolar (SGE) de escolas de Condução."
 	},
 	"item": [
 		{
@@ -74,7 +74,7 @@
 			]
 		},
 		{
-			"name": "Escolas",
+			"name": "escolas",
 			"item": [
 				{
 					"name": "Criar Escola",
@@ -111,7 +111,7 @@
 					"response": []
 				},
 				{
-					"name": "Listar Escolas",
+					"name": "Listar escolas",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -139,7 +139,7 @@
 			]
 		},
 		{
-			"name": "Alunos",
+			"name": "alunos",
 			"item": [
 				{
 					"name": "Criar Aluno",
@@ -176,7 +176,7 @@
 					"response": []
 				},
 				{
-					"name": "Listar Alunos",
+					"name": "Listar alunos",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -334,7 +334,7 @@
 			]
 		},
 		{
-			"name": "Aulas",
+			"name": "aulas",
 			"item": [
 				{
 					"name": "Criar Aula",
@@ -371,7 +371,7 @@
 					"response": []
 				},
 				{
-					"name": "Listar Aulas",
+					"name": "Listar aulas",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -399,7 +399,7 @@
 			]
 		},
 		{
-			"name": "Exames",
+			"name": "exames",
 			"item": [
 				{
 					"name": "Criar Exame",
@@ -436,7 +436,7 @@
 					"response": []
 				},
 				{
-					"name": "Listar Exames",
+					"name": "Listar exames",
 					"request": {
 						"method": "GET",
 						"header": [

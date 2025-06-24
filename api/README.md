@@ -1,16 +1,16 @@
 # API SGE-Condução
 
-Esta é a API RESTful para o Sistema de Gestão Escolar (SGE) de Escolas de Condução, desenvolvida em Node.js com Express.js e MySQL.
+Esta é a API RESTful para o Sistema de Gestão Escolar (SGE) de escolas de Condução, desenvolvida em Node.js com Express.js e MySQL.
 
 ## Funcionalidades
 
 - Autenticação de usuários (registro e login com JWT)
-- Gestão de Escolas (CRUD)
-- Gestão de Alunos (CRUD)
+- Gestão de escolas (CRUD)
+- Gestão de alunos (CRUD)
 - Gestão de Categorias de Carta (CRUD)
 - Gestão de Matrículas (CRUD)
-- Gestão de Aulas (CRUD)
-- Gestão de Exames (CRUD)
+- Gestão de aulas (CRUD)
+- Gestão de exames (CRUD)
 - Gestão Financeira (Parcelas e Pagamentos)
 
 ## Configuração do Ambiente
@@ -109,7 +109,7 @@ O servidor estará rodando em `http://localhost:4000` (ou na porta especificada 
     -   **Body:** `{ "email", "senha" }`
     -   **Response:** `{ "token": "<jwt_token>" }`
 
-### Escolas (`/api/escolas`)
+### escolas (`/api/escolas`)
 
 -   `POST /api/escolas`: Cria uma nova escola. (Auth: Super Admin, Admin Escola)
 -   `GET /api/escolas`: Lista todas as escolas. (Auth: Todos com acesso a escolas)
@@ -117,7 +117,7 @@ O servidor estará rodando em `http://localhost:4000` (ou na porta especificada 
 -   `PUT /api/escolas/:id`: Atualiza uma escola existente. (Auth: Super Admin, Admin Escola)
 -   `DELETE /api/escolas/:id`: Deleta uma escola. (Auth: Super Admin)
 
-### Alunos (`/api/alunos`)
+### alunos (`/api/alunos`)
 
 -   `POST /api/alunos`: Cria um novo aluno. (Auth: Super Admin, Admin Escola, Gestor Escola Específica)
 -   `GET /api/alunos`: Lista todos os alunos. (Auth: Todos com acesso a alunos)
@@ -141,7 +141,7 @@ O servidor estará rodando em `http://localhost:4000` (ou na porta especificada 
 -   `PUT /api/matriculas/:id`: Atualiza uma matrícula existente. (Auth: Super Admin, Admin Escola, Gestor Escola Específica)
 -   `DELETE /api/matriculas/:id`: Deleta uma matrícula. (Auth: Super Admin, Admin Escola)
 
-### Aulas (`/api/aulas`)
+### aulas (`/api/aulas`)
 
 -   `POST /api/aulas`: Cria uma nova aula. (Auth: Super Admin, Admin Escola, Gestor Escola Específica)
 -   `GET /api/aulas`: Lista todas as aulas. (Auth: Todos com acesso a aulas)
@@ -149,7 +149,7 @@ O servidor estará rodando em `http://localhost:4000` (ou na porta especificada 
 -   `PUT /api/aulas/:id`: Atualiza uma aula existente. (Auth: Super Admin, Admin Escola, Gestor Escola Específica, Instrutor)
 -   `DELETE /api/aulas/:id`: Deleta uma aula. (Auth: Super Admin, Admin Escola)
 
-### Exames (`/api/exames`)
+### exames (`/api/exames`)
 
 -   `POST /api/exames`: Cria um novo exame. (Auth: Super Admin, Admin Escola, Gestor Escola Específica)
 -   `GET /api/exames`: Lista todos os exames. (Auth: Todos com acesso a exames)

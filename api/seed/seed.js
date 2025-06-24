@@ -8,7 +8,7 @@ async function seedDatabase() {
     try {
         console.log("Iniciando o processo de seeding...");
 
-        // 1. Inserir TiposUtilizador (se não existirem)
+        // 1. Inserir tiposUtilizador (se não existirem)
         const userTypes = [
             { id: 1, nome_tipo: "Super Admin", descricao: "Administrador com acesso total ao sistema." },
             { id: 2, nome_tipo: "Admin Escola", descricao: "Administrador de uma ou mais escolas específicas." },
@@ -19,9 +19,9 @@ async function seedDatabase() {
         ];
 
         for (const type of userTypes) {
-            const [rows] = await pool.execute("SELECT id_tipo_utilizador FROM TiposUtilizador WHERE id_tipo_utilizador = ?", [type.id]);
+            const [rows] = await pool.execute("SELECT id_tipo_utilizador FROM tiposUtilizador WHERE id_tipo_utilizador = ?", [type.id]);
             if (rows.length === 0) {
-                await pool.execute("INSERT INTO TiposUtilizador (id_tipo_utilizador, nome_tipo, descricao) VALUES (?, ?, ?)", [type.id, type.nome_tipo, type.descricao]);
+                await pool.execute("INSERT INTO tiposUtilizador (id_tipo_utilizador, nome_tipo, descricao) VALUES (?, ?, ?)", [type.id, type.nome_tipo, type.descricao]);
                 console.log(`Tipo de Usuário '${type.nome_tipo}' inserido.`);
             } else {
                 console.log(`Tipo de Usuário '${type.nome_tipo}' já existe.`);
@@ -41,10 +41,10 @@ async function seedDatabase() {
         };
 
         let escolaId;
-        const [escolaRows] = await pool.execute("SELECT id_escola FROM Escolas WHERE email = ?", [escolaData.email]);
+        const [escolaRows] = await pool.execute("SELECT id_escola FROM escolas WHERE email = ?", [escolaData.email]);
         if (escolaRows.length === 0) {
             const [result] = await pool.execute(
-                "INSERT INTO Escolas (nome_escola, endereco, distrito, provincia, telefone, email, nuit, logo_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO escolas (nome_escola, endereco, distrito, provincia, telefone, email, nuit, logo_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 [escolaData.nome_escola, escolaData.endereco, escolaData.distrito, escolaData.provincia, escolaData.telefone, escolaData.email, escolaData.nuit, escolaData.logo_url]
             );
             escolaId = result.insertId;
@@ -108,10 +108,10 @@ async function seedDatabase() {
         ];
 
         for (const categoria of categoriasCarta) {
-            const [rows] = await pool.execute("SELECT id_categoria FROM CategoriasCarta WHERE codigo_categoria = ?", [categoria.codigo_categoria]);
+            const [rows] = await pool.execute("SELECT id_categoria FROM categoriascarta WHERE codigo_categoria = ?", [categoria.codigo_categoria]);
             if (rows.length === 0) {
                 await pool.execute(
-                    "INSERT INTO CategoriasCarta (codigo_categoria, descricao, tipo) VALUES (?, ?, ?)",
+                    "INSERT INTO categoriascarta (codigo_categoria, descricao, tipo) VALUES (?, ?, ?)",
                     [categoria.codigo_categoria, categoria.descricao, categoria.tipo]
                 );
                 console.log(`Categoria de Carta '${categoria.codigo_categoria}' inserida.`);

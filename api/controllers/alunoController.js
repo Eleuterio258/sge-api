@@ -155,7 +155,7 @@ exports.exportarAlunosExcel = async (req, res) => {
         }
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Alunos");
+        XLSX.utils.book_append_sheet(wb, ws, "alunos");
         const filePath = `alunos_export_${Date.now()}.xlsx`;
         XLSX.writeFile(wb, filePath);
         // Upload para MinIO
