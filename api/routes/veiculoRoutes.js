@@ -6,7 +6,7 @@ const { authenticateToken, authorizeRoles } = require("../middleware/authMiddlew
 // Criar veículo
 router.post("/", authenticateToken, authorizeRoles(1, 2), veiculoController.createVeiculo); // Super Admin, Admin Escola
 // Listar todos
-router.get("/", authenticateToken, authorizeRoles(1, 2, 3, 4), veiculoController.getAllVeiculos);
+router.get("/", authenticateToken, authorizeRoles(1, 2, 3, 4), veiculoController.getAllveiculos);
 // Buscar por ID
 router.get("/:id", authenticateToken, authorizeRoles(1, 2, 3, 4), veiculoController.getVeiculoById);
 // Atualizar

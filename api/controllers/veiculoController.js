@@ -9,7 +9,7 @@ exports.createVeiculo = async (req, res) => {
   }
 };
 
-exports.getAllVeiculos = async (req, res) => {
+exports.getAllveiculos = async (req, res) => {
   try {
     const veiculos = await Veiculo.getAll();
     res.status(200).json(veiculos);
