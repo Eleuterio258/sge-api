@@ -8,7 +8,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Configuração base do Axios
 const apiClient = axios.create({
- baseURL: 'http://135.181.249.37/api',
+ baseURL: 'http://135.181.249.37:4000/api',
  timeout: 10000,
  headers: {
    'Content-Type': 'application/json',
