@@ -8,7 +8,7 @@ async function seedDatabase() {
     try {
         console.log("Iniciando o processo de seeding...");
 
-        // 1. Inserir tiposUtilizador (se não existirem)
+        // 1. Inserir tiposutilizador (se não existirem)
         const userTypes = [
             { id: 1, nome_tipo: "Super Admin", descricao: "Administrador com acesso total ao sistema." },
             { id: 2, nome_tipo: "Admin Escola", descricao: "Administrador de uma ou mais escolas específicas." },
@@ -19,9 +19,9 @@ async function seedDatabase() {
         ];
 
         for (const type of userTypes) {
-            const [rows] = await pool.execute("SELECT id_tipo_utilizador FROM tiposUtilizador WHERE id_tipo_utilizador = ?", [type.id]);
+            const [rows] = await pool.execute("SELECT id_tipo_utilizador FROM tiposutilizador WHERE id_tipo_utilizador = ?", [type.id]);
             if (rows.length === 0) {
-                await pool.execute("INSERT INTO tiposUtilizador (id_tipo_utilizador, nome_tipo, descricao) VALUES (?, ?, ?)", [type.id, type.nome_tipo, type.descricao]);
+                await pool.execute("INSERT INTO tiposutilizador (id_tipo_utilizador, nome_tipo, descricao) VALUES (?, ?, ?)", [type.id, type.nome_tipo, type.descricao]);
                 console.log(`Tipo de Usuário '${type.nome_tipo}' inserido.`);
             } else {
                 console.log(`Tipo de Usuário '${type.nome_tipo}' já existe.`);

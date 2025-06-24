@@ -22,7 +22,7 @@ async function unseedDatabase() {
             "utilizadores",
             "escolas",
             "categoriascarta",
-            "tiposUtilizador"
+            "tiposutilizador"
         ];
 
         for (const table of tables) {
