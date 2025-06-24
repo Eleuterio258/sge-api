@@ -56,12 +56,12 @@ async function seedDatabase() {
 
         // 3. Inserir um Usuário Super Admin de Exemplo (se não existir)
         const superAdminEmail = "superadmin@example.com";
-        const [adminRows] = await pool.execute("SELECT id_utilizador FROM Utilizadores WHERE email = ?", [superAdminEmail]);
+        const [adminRows] = await pool.execute("SELECT id_utilizador FROM utilizadores WHERE email = ?", [superAdminEmail]);
 
         if (adminRows.length === 0) {
             const hashedPassword = await bcrypt.hash("senhaSegura123", 10); // Senha: senhaSegura123
             const [result] = await pool.execute(
-                "INSERT INTO Utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
                 ["Super Admin", superAdminEmail, hashedPassword, "+258840000000", 1] // id_tipo_utilizador 1 para Super Admin
             );
             console.log(`Usuário Super Admin '${superAdminEmail}' inserido com ID: ${result.insertId}`);
@@ -71,12 +71,12 @@ async function seedDatabase() {
 
         // 4. Inserir um Usuário Admin Escola de Exemplo (se não existir)
         const adminEscolaEmail = "adminescola@example.com";
-        const [adminEscolaRows] = await pool.execute("SELECT id_utilizador FROM Utilizadores WHERE email = ?", [adminEscolaEmail]);
+        const [adminEscolaRows] = await pool.execute("SELECT id_utilizador FROM utilizadores WHERE email = ?", [adminEscolaEmail]);
 
         if (adminEscolaRows.length === 0) {
             const hashedPassword = await bcrypt.hash("senhaEscola123", 10); // Senha: senhaEscola123
             const [result] = await pool.execute(
-                "INSERT INTO Utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
                 ["Admin da Escola Central", adminEscolaEmail, hashedPassword, "+258841112233", 2] // id_tipo_utilizador 2 para Admin Escola
             );
             const adminEscolaId = result.insertId;

@@ -19,7 +19,7 @@ async function unseedDatabase() {
             "Matriculas",
             "Escola_Utilizadores",
             "Alunos",
-            "Utilizadores",
+            "utilizadores",
             "Escolas",
             "CategoriasCarta",
             "TiposUtilizador"

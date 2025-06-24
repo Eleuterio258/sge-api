@@ -4,24 +4,24 @@ class User {
     static async create(userData) {
         const { nome_completo, email, senha_hash, telefone, id_tipo_utilizador } = userData;
         const [result] = await pool.execute(
-            "INSERT INTO Utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO utilizadores (nome_completo, email, senha_hash, telefone, id_tipo_utilizador) VALUES (?, ?, ?, ?, ?)",
             [nome_completo, email, senha_hash, telefone, id_tipo_utilizador]
         );
         return result.insertId;
     }
 
     static async findByEmail(email) {
-        const [rows] = await pool.execute("SELECT * FROM Utilizadores WHERE email = ?", [email]);
+        const [rows] = await pool.execute("SELECT * FROM utilizadores WHERE email = ?", [email]);
         return rows[0];
     }
 
     static async findById(id) {
-        const [rows] = await pool.execute("SELECT * FROM Utilizadores WHERE id_utilizador = ?", [id]);
+        const [rows] = await pool.execute("SELECT * FROM utilizadores WHERE id_utilizador = ?", [id]);
         return rows[0];
     }
 
     static async getAll() {
-        const [rows] = await pool.execute("SELECT * FROM Utilizadores");
+        const [rows] = await pool.execute("SELECT * FROM utilizadores");
         return rows;
     }
 
@@ -29,7 +29,7 @@ class User {
         const { nome_completo, email, telefone, id_tipo_utilizador, ativo, senha_hash } = userData;
         
         // Construir query dinamicamente baseada nos campos fornecidos
-        let query = "UPDATE Utilizadores SET ";
+        let query = "UPDATE utilizadores SET ";
         let params = [];
         let updates = [];
 
@@ -70,14 +70,14 @@ class User {
     }
 
     static async delete(id) {
-        const [result] = await pool.execute("DELETE FROM Utilizadores WHERE id_utilizador = ?", [id]);
+        const [result] = await pool.execute("DELETE FROM utilizadores WHERE id_utilizador = ?", [id]);
         return result.affectedRows;
     }
 
     static async findByEmailWithTipo(email) {
         const [rows] = await pool.execute(`
             SELECT u.*, t.nome_tipo as nome_tipo_utilizador
-            FROM Utilizadores u
+            FROM utilizadores u
             LEFT JOIN TiposUtilizador t ON u.id_tipo_utilizador = t.id_tipo_utilizador
             WHERE u.email = ?
         `, [email]);
