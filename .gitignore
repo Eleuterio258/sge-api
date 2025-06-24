@@ -1,0 +1,47 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+/dist
+/build
+
+# Logs
+logs
+*.log
+
+# dotenv
+.env
+.env.*
+
+# Docker
+*.local
+Dockerfile*
+docker-compose*
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads temporários
+api/uploads/
+
+# Outros
+*.sqlite
+*.sqlite3
+*.db
+
+# Ignore coverage
+coverage/
+
+# Ignore frontend build
+frontend/dist/
+frontend/node_modules/
+
+# Ignore backend build
+api/node_modules/ 
