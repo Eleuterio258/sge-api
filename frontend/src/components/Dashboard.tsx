@@ -1,5 +1,5 @@
-import { useAuth } from '@/contexts/AuthContext';
-import { MOCK_SCHOOLS } from '@/types/auth';
+import { useAuth } from '../contexts/AuthContext';
+import { MOCK_SCHOOLS } from '../types/auth';
 import { 
   Users, 
   GraduationCap, 

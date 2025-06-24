@@ -1,10 +1,10 @@
 // components/LoginPage.tsx
 import { useState, useEffect } from 'react';
 import { Car, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
- 
-import { useNavigation } from '../hooks/UseNavigation';
 import { getRoleBasedRoute, getWelcomeMessage } from '@/Utils/RoleRouting';
+ 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('superadmin@example.com');
@@ -12,8 +12,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isLoading, user, isAuthenticated } = useAuth();
-  const { navigate } = useNavigation();
+  const { login, isLoading, user, isAuthenticated, apiClient, accessToken } = useAuth();
+  const navigate = useNavigate();
+  const [matriculas, setMatriculas] = useState<Matricula[]>([]);
 
   // Redireciona se já estiver autenticado
   useEffect(() => {
@@ -161,20 +162,20 @@ export default function LoginPage() {
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                     Entrando...
                   </>
-               ) : (
-                'Entrar'
-              )}
-            </button>
-          </form>
+                ) : (
+                  'Entrar'
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-xs text-muted-foreground">
+          <p>Desenvolvido para gestão completa de escolas de condução</p>
+          <p className="mt-1">© 2024 DrivingSchool - Todos os direitos reservados</p>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="text-center text-xs text-muted-foreground">
-        <p>Desenvolvido para gestão completa de escolas de condução</p>
-        <p className="mt-1">© 2024 DrivingSchool - Todos os direitos reservados</p>
-      </div>
     </div>
-  </div>
-);
+  );
 }

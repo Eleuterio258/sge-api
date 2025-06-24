@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole, ROLE_PERMISSIONS } from '../types/auth';
- 
 import { useNavigation } from '../hooks/UseNavigation';
-import { canAccessRoute } from '@/Utils/RoleRouting';
+import { canAccessRoute } from '../Utils/RoleRouting';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

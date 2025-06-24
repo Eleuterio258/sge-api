@@ -12,7 +12,7 @@ export function ListaEscolas({ refreshKey }: { refreshKey: number }) {
 
   useEffect(() => {
     if (!accessToken) return;
-    axios.get<Escola[]>("http://135.181.249.37:4000/api/escolas", {
+    axios.get<Escola[]>("http://localhost:4000/api/escolas", {
       headers: { Authorization: `Bearer ${accessToken}` }
     })
     .then(res => setEscolas(res.data))

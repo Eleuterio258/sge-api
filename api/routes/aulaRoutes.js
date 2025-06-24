@@ -9,6 +9,7 @@ router.get("/", authenticateToken, authorizeRoles(1, 2, 3, 4, 5), aulaController
 router.get("/:id", authenticateToken, authorizeRoles(1, 2, 3, 4, 5), aulaController.getAulaById);
 router.put("/:id", authenticateToken, authorizeRoles(1, 2, 4, 5), aulaController.updateAula); // Instrutor (5) também pode atualizar
 router.delete("/:id", authenticateToken, authorizeRoles(1, 2), aulaController.deleteAula); // Super Admin (1), Admin Escola (2)
+router.get("/proximas", authenticateToken, authorizeRoles(1, 2, 3, 4, 5), aulaController.getProximasAulas);
 
 module.exports = router;
 

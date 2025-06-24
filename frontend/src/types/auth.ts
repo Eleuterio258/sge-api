@@ -13,6 +13,11 @@ export interface User {
   nome_tipo_utilizador: string;
   schoolId?: string;
   avatar?: string;
+  escolas_atribuidas?: Array<{
+    id_escola: number;
+    nome_escola: string;
+    ativo: number;
+  }>;
 }
 
 export interface AuthContextType {
@@ -30,6 +35,7 @@ export interface AuthContextType {
   apiClient: any;
   error: string | null;
   isAuthenticated: boolean;
+  interceptorsReady: boolean; // Added this property
 }
 
 export interface LoginResponse {
@@ -48,13 +54,13 @@ export interface Permission {
 export const USER_TYPE_MAPPING: Record<UserRole, string> = {
   1: 'superadmin',
   2: 'local_admin',
-  3: 'financial_manager',
+  3: 'financial',
   4: 'instructor',
   5: 'secretary',
   6: 'student'
 };
 
-// Mapeamento das rotas por role
+// Mapeamento das rotas por role - Atualizado para nova estrutura
 export const ROLE_ROUTES: Record<UserRole, string> = {
   1: '/admin/dashboard',
   2: '/local-admin/dashboard',
@@ -74,7 +80,7 @@ export const ROLE_NAMES: Record<UserRole, string> = {
   6: 'Estudante'
 };
 
-// Permissões baseadas no ID do tipo de utilizador
+// Permissões baseadas no ID do tipo de utilizador - Atualizadas
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   1: [ // Super Admin - Acesso total a tudo
     { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
@@ -87,7 +93,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { resource: 'reports', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'enrollments', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'system', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'admin', actions: ['create', 'read', 'update', 'delete'] },
+    { resource: 'superadmin', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'financial', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'secretary', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'student', actions: ['create', 'read', 'update', 'delete'] },
@@ -100,25 +106,30 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { resource: 'lessons', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'payments', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'reports', actions: ['read'] },
+    { resource: 'local-admin', actions: ['create', 'read', 'update', 'delete'] },
   ],
   3: [ // Gestor Financeiro
     { resource: 'schools', actions: ['read'] },
     { resource: 'students', actions: ['read'] },
     { resource: 'payments', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'reports', actions: ['read'] },
+    { resource: 'financial', actions: ['create', 'read', 'update', 'delete'] },
   ],
   4: [ // Instrutor
     { resource: 'schools', actions: ['read'] },
     { resource: 'students', actions: ['read'] },
     { resource: 'lessons', actions: ['read', 'update'] },
+    { resource: 'instructor', actions: ['read', 'update'] },
   ],
   5: [ // Secretário
     { resource: 'students', actions: ['create', 'read', 'update'] },
     { resource: 'lessons', actions: ['create', 'read'] },
     { resource: 'payments', actions: ['read'] },
+    { resource: 'secretary', actions: ['create', 'read', 'update'] },
   ],
   6: [ // Estudante
     { resource: 'lessons', actions: ['read'] },
+    { resource: 'student', actions: ['read'] },
   ],
 };
 
@@ -143,3 +154,51 @@ export const MOCK_SCHOOLS: School[] = [
     phone: '(11) 9876-5432'
   }
 ];
+
+// Additional interfaces for API responses
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Helper functions for permissions
+export const hasPermission = (
+  userRole: UserRole,
+  resource: string,
+  action: string
+): boolean => {
+  const permissions = ROLE_PERMISSIONS[userRole];
+  const resourcePermission = permissions.find(p => p.resource === resource);
+  return resourcePermission?.actions.includes(action) || false;
+};
+
+export const canAccessResource = (
+  userRole: UserRole,
+  resource: string
+): boolean => {
+  const permissions = ROLE_PERMISSIONS[userRole];
+  return permissions.some(p => p.resource === resource);
+};
+
+// Authentication state helpers
+export const isUserAuthenticated = (user: User | null, token: string | null): boolean => {
+  return !!(user && token);
+};
+
+export const getUserRoleName = (roleId: UserRole): string => {
+  return ROLE_NAMES[roleId] || 'Utilizador';
+};
+
+export const getUserRoute = (roleId: UserRole): string => {
+  return ROLE_ROUTES[roleId] || '/dashboard';
+};

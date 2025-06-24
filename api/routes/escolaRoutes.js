@@ -11,6 +11,9 @@ router.put("/:id", authenticateToken, authorizeRoles(1, 2), escolaController.upd
 router.delete("/:id", authenticateToken, authorizeRoles(1), escolaController.deleteEscola); // Apenas Super Admin
 router.get("/:id_escola/dashboard", authenticateToken, authorizeRoles(1, 2, 3, 4), escolaController.getDashboardStats);
 router.get("/dashboard/geral", authenticateToken, authorizeRoles(1, 2, 3, 4), escolaController.getDashboardStatsGeral);
+router.get("/atividades/recentes", authenticateToken, authorizeRoles(1), escolaController.getAtividadesRecentes);
+router.get("/conquistas/mes", authenticateToken, authorizeRoles(1), escolaController.getConquistasMes);
+router.get("/pendencias", authenticateToken, authorizeRoles(1), escolaController.getPendencias);
 
 module.exports = router;
 

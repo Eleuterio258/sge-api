@@ -42,7 +42,7 @@ class Escola {
         // Total de parcelas pendentes
         const [[{ total_parcelas_pendentes }]] = await pool.execute(`
             SELECT COUNT(*) as total_parcelas_pendentes
-            FROM Parcelas p
+            FROM parcelas p
             JOIN matriculas m ON p.id_matricula = m.id_matricula
             WHERE m.id_escola = ? AND p.status_parcela != 'Paga'
         `, [id_escola]);
@@ -69,7 +69,7 @@ class Escola {
         // Total de parcelas pendentes
         const [[{ total_parcelas_pendentes }]] = await pool.execute(`
             SELECT COUNT(*) as total_parcelas_pendentes
-            FROM Parcelas p
+            FROM parcelas p
             WHERE p.status_parcela != 'Paga'
         `);
         // Total recebido em pagamentos
@@ -82,6 +82,84 @@ class Escola {
             total_matriculas,
             total_parcelas_pendentes,
             total_pago
+        };
+    }
+
+    static async getAtividadesRecentes() {
+        // Matrículas recentes
+        const [matriculas] = await pool.execute(`
+            SELECT m.data_matricula as data_evento, 'matricula' as tipo, CONCAT('Nova matrícula: ', a.nome_completo) as mensagem, m.id_escola
+            FROM matriculas m
+            JOIN alunos a ON m.id_aluno = a.id_aluno
+            ORDER BY m.data_matricula DESC
+            LIMIT 10
+        `);
+        // Pagamentos recentes
+        const [pagamentos] = await pool.execute(`
+            SELECT p.data_pagamento as data_evento, 'pagamento' as tipo, CONCAT('Pagamento recebido: ', a.nome_completo) as mensagem, m.id_escola
+            FROM pagamentos p
+            JOIN matriculas m ON p.id_matricula = m.id_matricula
+            JOIN alunos a ON m.id_aluno = a.id_aluno
+            ORDER BY p.data_pagamento DESC
+            LIMIT 10
+        `);
+        // Aulas agendadas recentemente
+        const [aulas] = await pool.execute(`
+            SELECT CONCAT(a.data_aula, ' ', a.hora_inicio) as data_evento, 'aula' as tipo, CONCAT('Aula agendada: ', al.nome_completo) as mensagem, m.id_escola
+            FROM aulas a
+            JOIN matriculas m ON a.id_matricula = m.id_matricula
+            JOIN alunos al ON m.id_aluno = al.id_aluno
+            ORDER BY a.data_aula DESC, a.hora_inicio DESC
+            LIMIT 10
+        `);
+        // Exames aprovados recentemente
+        const [exames] = await pool.execute(`
+            SELECT e.data_exame as data_evento, 'exame' as tipo, CONCAT('Exame aprovado: ', a.nome_completo) as mensagem, m.id_escola
+            FROM exames e
+            JOIN matriculas m ON e.id_matricula = m.id_matricula
+            JOIN alunos a ON m.id_aluno = a.id_aluno
+            WHERE e.resultado = 'Aprovado'
+            ORDER BY e.data_exame DESC
+            LIMIT 10
+        `);
+        // Unir e ordenar todos os eventos por data_evento desc
+        const todas = [...matriculas, ...pagamentos, ...aulas, ...exames];
+        todas.sort((a, b) => new Date(b.data_evento).getTime() - new Date(a.data_evento).getTime());
+        return todas.slice(0, 10);
+    }
+
+    static async getConquistasMes() {
+        const now = new Date();
+        const ano = now.getFullYear();
+        const mes = (now.getMonth() + 1).toString().padStart(2, '0');
+        // Exames aprovados no mês
+        const [[{ aprovados }]] = await pool.execute(`
+            SELECT COUNT(*) as aprovados FROM exames 
+            WHERE resultado = 'Aprovado' AND DATE_FORMAT(data_exame, '%Y-%m') = ?
+        `, [`${ano}-${mes}`]);
+        // Novas matrículas no mês
+        const [[{ matriculas }]] = await pool.execute(`
+            SELECT COUNT(*) as matriculas FROM matriculas 
+            WHERE DATE_FORMAT(data_matricula, '%Y-%m') = ?
+        `, [`${ano}-${mes}`]);
+        // Receita do mês
+        const [[{ receita }]] = await pool.execute(`
+            SELECT COALESCE(SUM(valor_pago),0) as receita FROM pagamentos 
+            WHERE DATE_FORMAT(data_pagamento, '%Y-%m') = ?
+        `, [`${ano}-${mes}`]);
+        return { aprovados, matriculas, receita };
+    }
+
+    static async getPendencias() {
+        // Pagamentos em atraso
+        const [[{ pagamentos }]] = await pool.execute(`
+            SELECT COUNT(*) as pagamentos FROM parcelas WHERE status_parcela != 'Paga'
+        `);
+        // Documentos vencidos e veículos em manutenção não implementados
+        return {
+            pagamentos,
+            documentos: 0,
+            manutencao: 0
         };
     }
 }

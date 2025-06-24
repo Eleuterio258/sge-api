@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Plus, Trash2, Search, Building, Users, Link, Unlink, AlertCircle, CheckCircle } from "lucide-react";
 
 interface Escola {
@@ -55,10 +55,26 @@ const UserSchoolAssignment: React.FC = () => {
     id_utilizador: ""
   });
 
-  // Verificação de permissões
-  const hasPermission = () => {
-    return isAuthenticated && user && [1, 2, 3].includes(user.id_tipo_utilizador);
-  };
+  // Bloqueio de acesso para não Super Admin
+  if (!user || user.id_tipo_utilizador !== 1) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Erro de Acesso
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>Você não tem permissão para acessar esta funcionalidade. Apenas Super Admins podem atribuir usuários a escolas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (isAuthenticated && accessToken) {
@@ -85,8 +101,8 @@ const UserSchoolAssignment: React.FC = () => {
   }, [error]);
 
   const fetchData = async () => {
-    if (!hasPermission()) {
-      setError("Você não tem permissão para acessar esta funcionalidade.");
+    if (!isAuthenticated || !accessToken) {
+      setError("Usuário não autenticado. Faça login novamente.");
       setLoading(false);
       return;
     }
@@ -271,37 +287,6 @@ const UserSchoolAssignment: React.FC = () => {
         <div className="flex items-center justify-center h-64">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <span className="ml-3 text-gray-600">Carregando dados...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!hasPermission()) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-400" />
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Erro de Acesso
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>Você não tem permissão para acessar esta funcionalidade. Apenas Super Admins, Admins de Escola e Gestores Gerais podem gerenciar atribuições.</p>
-                
-                <div className="mt-4 p-4 bg-red-100 rounded-md">
-                  <p className="font-medium mb-2">Informações de Debug:</p>
-                  <div className="text-xs text-gray-600 space-y-1">
-                    <p>Usuário atual: {user ? `${user.nome_completo} (${user.email})` : 'Não autenticado'}</p>
-                    <p>Tipo de usuário: {user?.id_tipo_utilizador || 'N/A'}</p>
-                    <p>Autenticado: {isAuthenticated ? 'Sim' : 'Não'}</p>
-                    <p>Token existe: {accessToken ? 'Sim' : 'Não'}</p>
-                    <p>Token válido: {isTokenValid() ? 'Sim' : 'Não'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     );

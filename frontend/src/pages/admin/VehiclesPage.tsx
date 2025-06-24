@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
+ 
 
-interface Aula {
-  id_aula: number;
-  tipo_aula: string;
-  data_aula: string;
-  hora_inicio: string;
-  hora_fim: string;
-  id_instrutor: number;
-  id_matricula: number;
+interface Veiculo {
+  id_veiculo: number;
+  placa: string;
+  modelo: string;
+  marca: string;
+  ano: string;
+  categoria: string;
   id_escola?: number | string;
 }
 
-const API_URL = "http://135.181.249.37:4000/api/aulas";
+const API_URL = "http://localhost:4000/api/veiculos";
 
-const LessonsPage: React.FC = () => {
-  const [aulas, setAulas] = useState<Aula[]>([]);
+const VehiclesPage: React.FC = () => {
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [editAula, setEditAula] = useState<Aula | null>(null);
-  const [form, setForm] = useState<Partial<Aula>>({});
+  const [editVeiculo, setEditVeiculo] = useState<Veiculo | null>(null);
+  const [form, setForm] = useState<Partial<Veiculo>>({});
   const [submitting, setSubmitting] = useState(false);
   const { accessToken, isTokenValid, getCurrentUserSchool } = useAuth();
 
-  const fetchAulas = async () => {
+  const fetchVeiculos = async () => {
     const schoolId = getCurrentUserSchool();
     if (!accessToken || !isTokenValid() || !schoolId) {
       setError("Token de acesso inválido ou escola não encontrada. Faça login novamente.");
@@ -37,29 +37,29 @@ const LessonsPage: React.FC = () => {
       const res = await axios.get(`${API_URL}/escola/${schoolId}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setAulas(res.data);
+      setVeiculos(res.data);
       setError(null);
     } catch (err) {
-      setError("Erro ao buscar aulas");
+      setError("Erro ao buscar veículos");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAulas();
+    fetchVeiculos();
     // eslint-disable-next-line
   }, [accessToken, isTokenValid, getCurrentUserSchool]);
 
-  const handleOpenModal = (aula?: Aula) => {
-    setEditAula(aula || null);
-    setForm(aula ? { ...aula } : {});
+  const handleOpenModal = (veiculo?: Veiculo) => {
+    setEditVeiculo(veiculo || null);
+    setForm(veiculo ? { ...veiculo } : {});
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditAula(null);
+    setEditVeiculo(null);
     setForm({});
   };
 
@@ -73,9 +73,9 @@ const LessonsPage: React.FC = () => {
     setSubmitting(true);
     const schoolId = getCurrentUserSchool();
     try {
-      if (editAula) {
+      if (editVeiculo) {
         // Editar
-        await axios.put(`${API_URL}/${editAula.id_aula}`, { ...form, id_escola: schoolId }, {
+        await axios.put(`${API_URL}/${editVeiculo.id_veiculo}`, { ...form, id_escola: schoolId }, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
       } else {
@@ -85,23 +85,23 @@ const LessonsPage: React.FC = () => {
         });
       }
       handleCloseModal();
-      fetchAulas();
+      fetchVeiculos();
     } catch (err) {
-      setError("Erro ao salvar aula");
+      setError("Erro ao salvar veículo");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (aula: Aula) => {
-    if (!window.confirm(`Deseja realmente deletar a aula do dia ${aula.data_aula}?`)) return;
+  const handleDelete = async (veiculo: Veiculo) => {
+    if (!window.confirm(`Deseja realmente deletar o veículo ${veiculo.placa}?`)) return;
     try {
-      await axios.delete(`${API_URL}/${aula.id_aula}`, {
+      await axios.delete(`${API_URL}/${veiculo.id_veiculo}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      fetchAulas();
+      fetchVeiculos();
     } catch (err) {
-      setError("Erro ao deletar aula");
+      setError("Erro ao deletar veículo");
     }
   };
 
@@ -110,20 +110,20 @@ const LessonsPage: React.FC = () => {
       <div className="w-full max-w-5xl bg-card rounded-lg shadow border p-6">
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="text-center md:text-left">
-            <h1 className="text-3xl font-bold text-foreground mb-1">Aulas da Escola</h1>
-            <p className="text-muted-foreground text-lg">Visualize e gerencie as aulas cadastradas na sua escola</p>
+            <h1 className="text-3xl font-bold text-foreground mb-1">Veículos da Escola</h1>
+            <p className="text-muted-foreground text-lg">Visualize e gerencie os veículos cadastrados na sua escola</p>
           </div>
           <button
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md font-medium transition-colors"
             onClick={() => handleOpenModal()}
           >
-            Nova Aula
+            Novo Veículo
           </button>
         </div>
         {loading && (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-muted-foreground text-lg">Carregando aulas...</p>
+            <p className="text-muted-foreground text-lg">Carregando veículos...</p>
           </div>
         )}
         {error && (
@@ -136,47 +136,49 @@ const LessonsPage: React.FC = () => {
             <table className="min-w-full border rounded-lg overflow-hidden bg-background">
               <thead>
                 <tr className="bg-muted">
-                  <th className="border px-4 py-2 text-left">Tipo</th>
-                  <th className="border px-4 py-2 text-left">Data</th>
-                  <th className="border px-4 py-2 text-left">Início</th>
-                  <th className="border px-4 py-2 text-left">Fim</th>
+                  <th className="border px-4 py-2 text-left">Placa</th>
+                  <th className="border px-4 py-2 text-left">Modelo</th>
+                  <th className="border px-4 py-2 text-left">Marca</th>
+                  <th className="border px-4 py-2 text-left">Ano</th>
+                  <th className="border px-4 py-2 text-left">Categoria</th>
                   <th className="border px-4 py-2 text-left">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {aulas.map((aula, idx) => (
+                {veiculos.map((veiculo, idx) => (
                   <tr
-                    key={aula.id_aula}
+                    key={veiculo.id_veiculo}
                     className={
                       idx % 2 === 0
                         ? "bg-white hover:bg-accent transition-colors"
                         : "bg-muted/50 hover:bg-accent transition-colors"
                     }
                   >
-                    <td className="border px-4 py-2">{aula.tipo_aula}</td>
-                    <td className="border px-4 py-2">{aula.data_aula}</td>
-                    <td className="border px-4 py-2">{aula.hora_inicio}</td>
-                    <td className="border px-4 py-2">{aula.hora_fim}</td>
+                    <td className="border px-4 py-2">{veiculo.placa}</td>
+                    <td className="border px-4 py-2">{veiculo.modelo}</td>
+                    <td className="border px-4 py-2">{veiculo.marca}</td>
+                    <td className="border px-4 py-2">{veiculo.ano}</td>
+                    <td className="border px-4 py-2">{veiculo.categoria}</td>
                     <td className="border px-4 py-2 flex gap-2">
                       <button
                         className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        onClick={() => handleOpenModal(aula)}
+                        onClick={() => handleOpenModal(veiculo)}
                       >
                         Editar
                       </button>
                       <button
                         className="inline-flex items-center gap-2 rounded-md bg-red-500 text-white hover:bg-red-600 px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-300"
-                        onClick={() => handleDelete(aula)}
+                        onClick={() => handleDelete(veiculo)}
                       >
                         Deletar
                       </button>
                     </td>
                   </tr>
                 ))}
-                {aulas.length === 0 && (
+                {veiculos.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="text-center text-muted-foreground py-8">
-                      Nenhuma aula cadastrada.
+                    <td colSpan={6} className="text-center text-muted-foreground py-8">
+                      Nenhum veículo cadastrado.
                     </td>
                   </tr>
                 )}
@@ -188,12 +190,13 @@ const LessonsPage: React.FC = () => {
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
-              <h3 className="text-xl font-bold mb-4 text-foreground">{editAula ? 'Editar Aula' : 'Nova Aula'}</h3>
+              <h3 className="text-xl font-bold mb-4 text-foreground">{editVeiculo ? 'Editar Veículo' : 'Novo Veículo'}</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <input name="tipo_aula" value={form.tipo_aula || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Tipo de Aula" required />
-                <input name="data_aula" type="date" value={form.data_aula || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Data" required />
-                <input name="hora_inicio" value={form.hora_inicio || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Hora de Início" required />
-                <input name="hora_fim" value={form.hora_fim || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Hora de Fim" required />
+                <input name="placa" value={form.placa || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Placa" required />
+                <input name="modelo" value={form.modelo || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Modelo" required />
+                <input name="marca" value={form.marca || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Marca" required />
+                <input name="ano" value={form.ano || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Ano" required />
+                <input name="categoria" value={form.categoria || ''} onChange={handleChange} className="p-2 border rounded w-full" placeholder="Categoria" required />
                 {/* Adicione outros campos necessários aqui */}
                 <div className="flex gap-4 justify-end mt-4">
                   <button type="button" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" onClick={handleCloseModal}>
@@ -212,4 +215,4 @@ const LessonsPage: React.FC = () => {
   );
 };
 
-export default LessonsPage; 
+export default VehiclesPage; 

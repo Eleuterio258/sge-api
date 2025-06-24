@@ -59,4 +59,14 @@ exports.deleteAula = async (req, res) => {
     }
 };
 
+exports.getProximasAulas = async (req, res) => {
+    try {
+        const aulas = await Aula.getProximasAulas();
+        res.status(200).json(aulas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar próximas aulas" });
+    }
+};
+
 

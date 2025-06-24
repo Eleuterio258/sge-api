@@ -1,34 +1,40 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Layout } from "./components/Layout";
-import LoginPage from "./pages/LoginPage";
-import { Dashboard } from "./components/Dashboard";
- 
+import LoginPage from "./pages/auth/LoginPage";
 import NotFound from "./pages/NotFound";
- 
-import { EscolasPage } from "./pages/EscolasPage";
+import UnauthorizedPage from "./components/UnauthorizedPage";
+import { Dashboard } from "./components/Dashboard";
+
+// Admin (Local Admin)
+import StudentsPage from "./pages/admin/StudentsPage";
+import VehiclesPage from "./pages/admin/VehiclesPage";
+import LessonsPage from "./pages/admin/LessonsPage";
+import { EscolasPage } from "./pages/admin/EscolasPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
+// Financeiro
+import FinancialDashboard from "./pages/finaceiro/FinancialDashboard";
+import FinancialReports from "./pages/finaceiro/FinancialReports";
+
+// Instrutor
+import InstructorDashboard from "./pages/instrutor/InstructorDashboard";
+import InstructorPage from "./pages/instrutor/InstructorPage";
+
+// Superadmin
+import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
+import UsersManagement from "./pages/superadmin/UsersManagement";
+import SchoolsManagement from "./pages/superadmin/SchoolsManagement";
+import StudentManagements from "./pages/superadmin/StudentManagements";
+import StudentManagementsDetails from "./pages/superadmin/StudentManagementsDetails";
+import SystemReports from "./pages/superadmin/SystemReports";
+import UserSchoolAssignment from "./pages/superadmin/UserSchoolAssignment";
+import PaymentsManagement from "./pages/superadmin/PaymentsManagement";
+import VehiclesManagement from "./pages/superadmin/VehiclesManagement";
+import LessonsManagement from "./pages/superadmin/LessonsManagement";
 
 import { UserRole, ROLE_PERMISSIONS } from "./types/auth";
 
-import FinancialDashboard from "./pages/FinancialDashboard";
-import FinancialReports from "./pages/FinancialReports";
-import InstructorDashboard from "./pages/InstructorDashboard";
-import PaymentsManagement from "./pages/PaymentsManagement";
-import SchoolsManagement from "./pages/SchoolsManagement";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
-import SystemReports from "./pages/SystemReports";
-import UsersManagement from "./pages/UsersManagement";
-import UserSchoolAssignment from "./pages/UserSchoolAssignment";
-import UnauthorizedPage from "./components/UnauthorizedPage";
-import StudentManagements from "./pages/StudentManagements";
-import StudentManagementsDetails from "./pages/StudentManagementsDetails";
-import LessonsManagement from "./pages/LessonsManagement";
-import VehiclesManagement from "./pages/VehiclesManagement";
-import StudentsPage from './pages/StudentsPage';
-import VehiclesPage from './pages/VehiclesPage';
-import LessonsPage from './pages/LessonsPage';
-import InstructorPage from './pages/InstructorPage';
- 
 // Componente para verificar permissões específicas
 function PermissionRoute({ 
   children, 
@@ -103,7 +109,7 @@ function RoleBasedRedirect() {
   // Redireciona baseado no role do usuário
   const roleRoutes = {
     1: '/admin/dashboard',      // Super Admin
-    2: '/dashboard',            // Local Admin
+    2: '/local-admin/dashboard', // Local Admin
     3: '/financial/dashboard',  // Financial Manager
     4: '/instructor/dashboard', // Instructor
     5: '/secretary/dashboard',  // Secretary
@@ -150,7 +156,7 @@ const App = () => (
           
       
           {/* Gestão de escolas - apenas Super Admin e Local Admin */}
-          // ROTA REMOVIDA: <Route path="escolas" element={<PermissionRoute requiredPermission={{ resource: 'schools', action: 'read' }}><EscolasPage /></PermissionRoute>} />
+          <Route path="escolas" element={<PermissionRoute requiredPermission={{ resource: 'schools', action: 'read' }}><EscolasPage /></PermissionRoute>} />
           
           {/* Rotas adicionais para itens do sidebar */}
           <Route 
@@ -178,18 +184,94 @@ const App = () => (
         <Route 
           path="/admin/*" 
           element={
-            <PermissionRoute allowedRoles={[1]}>
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'superadmin', action: 'read' }}
+            >
               <Layout />
             </PermissionRoute>
           }
         >
-          <Route path="dashboard" element={<SuperAdminDashboard />} />
-          <Route path="users" element={<UsersManagement />} />
-          <Route path="schools" element={<SchoolsManagement />} />
-          <Route path="student-managements" element={<StudentManagements />} />
-          <Route path="student-managements/:id" element={<StudentManagementsDetails />} />
-          <Route path="reports" element={<SystemReports />} />
-          <Route path="user-school-assignment" element={<UserSchoolAssignment />} />
+          <Route path="dashboard" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'superadmin', action: 'read' }}
+            >
+              <SuperAdminDashboard />
+            </PermissionRoute>
+          } />
+          <Route path="student-managements" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'students', action: 'read' }}
+            >
+              <StudentManagements />
+            </PermissionRoute>
+          } />
+          <Route path="vehicles" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'vehicles', action: 'read' }}
+            >
+              <VehiclesManagement />
+            </PermissionRoute>
+          } />
+          <Route path="lessons" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'lessons', action: 'read' }}
+            >
+              <LessonsManagement />
+            </PermissionRoute>
+          } />
+          <Route path="instructors" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'instructors', action: 'read' }}
+            >
+              <InstructorPage />
+            </PermissionRoute>
+          } />
+          <Route path="users" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'users', action: 'read' }}
+            >
+              <UsersManagement />
+            </PermissionRoute>
+          } />
+          <Route path="schools" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'schools', action: 'read' }}
+            >
+              <SchoolsManagement />
+            </PermissionRoute>
+          } />
+          <Route path="user-school-assignment" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'users', action: 'update' }}
+            >
+              <UserSchoolAssignment />
+            </PermissionRoute>
+          } />
+          <Route path="student-managements/:id" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'students', action: 'read' }}
+            >
+              <StudentManagementsDetails />
+            </PermissionRoute>
+          } />
+          <Route path="reports" element={
+            <PermissionRoute 
+              allowedRoles={[1]} 
+              requiredPermission={{ resource: 'reports', action: 'read' }}
+            >
+              <SystemReports />
+            </PermissionRoute>
+          } />
         </Route>
 
         {/* Financial Manager Dashboard */}

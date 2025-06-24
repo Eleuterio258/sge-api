@@ -80,4 +80,34 @@ exports.getDashboardStatsGeral = async (req, res) => {
     }
 };
 
+exports.getAtividadesRecentes = async (req, res) => {
+    try {
+        const atividades = await Escola.getAtividadesRecentes();
+        res.status(200).json(atividades);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar atividades recentes" });
+    }
+};
+
+exports.getConquistasMes = async (req, res) => {
+    try {
+        const conquistas = await Escola.getConquistasMes();
+        res.status(200).json(conquistas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar conquistas do mês" });
+    }
+};
+
+exports.getPendencias = async (req, res) => {
+    try {
+        const pendencias = await Escola.getPendencias();
+        res.status(200).json(pendencias);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar pendências" });
+    }
+};
+
 

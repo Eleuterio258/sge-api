@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Plus, Edit, Trash2, Search, Filter, AlertCircle, CheckCircle } from "lucide-react";
 
 interface User {
@@ -52,7 +52,7 @@ const UsersManagement: React.FC = () => {
 
   // Verificação de permissões simplificada
   const hasPermission = () => {
-    return isAuthenticated && user && [1, 2].includes(user.id_tipo_utilizador);
+    return isAuthenticated && user && user.id_tipo_utilizador === 1;
   };
 
   useEffect(() => {
@@ -314,17 +314,14 @@ const UsersManagement: React.FC = () => {
                 Erro de Acesso
               </h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>Você não tem permissão para acessar esta funcionalidade. Apenas Super Admins e Admins de Escola podem gerenciar usuários.</p>
-                
+                <p>Você não tem permissão para acessar esta funcionalidade. Apenas Super Admins podem gerenciar usuários.</p>
                 <div className="mt-4 p-4 bg-red-100 rounded-md">
                   <p className="font-medium mb-2">Para acessar esta funcionalidade, você precisa:</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Fazer login como Super Admin (tipo 1) ou Admin de Escola (tipo 2)</li>
+                    <li>Fazer login como Super Admin (tipo 1)</li>
                     <li>Usar as credenciais de teste: superadmin@example.com / senhaSegura123</li>
-                    <li>Ou adminescola@example.com / senhaEscola123</li>
                   </ul>
                 </div>
-                
                 {/* Debug Information */}
                 <div className="mt-4 p-4 bg-gray-100 rounded-md">
                   <p className="font-medium mb-2 text-gray-800">Informações de Debug:</p>

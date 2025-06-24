@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Plus, Trash2, Edit, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
+import { Instrutor } from '@/types/instructor';
 
 interface Aula {
   id_aula: number;
@@ -24,11 +25,6 @@ interface Matricula {
   nome_aluno?: string;
 }
 
-interface Instrutor {
-  id_instrutor: number;
-  nome: string;
-}
-
 const initialForm: Partial<Aula> = {
   id_matricula: 0,
   id_instrutor: 0,
@@ -40,7 +36,7 @@ const initialForm: Partial<Aula> = {
   observacoes: '',
 };
 
-const LessonsManagement: React.FC = () => {
+const LessonsManagement = () => {
   const { apiClient, accessToken, isAuthenticated, user } = useAuth();
   const [aulas, setAulas] = useState<Aula[]>([]);
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
@@ -52,6 +48,27 @@ const LessonsManagement: React.FC = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<Aula>>(initialForm);
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Bloqueio de acesso para não Super Admin
+  if (!user || user.id_tipo_utilizador !== 1) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Erro de Acesso
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>Você não tem permissão para acessar esta funcionalidade. Apenas Super Admins podem gerenciar aulas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Permissões: 1=Super Admin, 2=Admin Escola, 4=Gestor Escola Específica
   const canManage = isAuthenticated && user && [1, 2, 4].includes(user.id_tipo_utilizador);
@@ -226,7 +243,7 @@ const LessonsManagement: React.FC = () => {
                 return (
                   <tr key={a.id_aula} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">{matricula ? `${matricula.id_matricula}${matricula.nome_aluno ? ' - ' + matricula.nome_aluno : ''}` : a.id_matricula}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{instrutor ? instrutor.nome : a.id_instrutor}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{instrutor ? instrutor.nome_completo : a.id_instrutor}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{a.tipo_aula}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{a.data_aula}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{a.hora_inicio}</td>
@@ -295,7 +312,7 @@ const LessonsManagement: React.FC = () => {
                 >
                   <option value="">Selecione um instrutor</option>
                   {instrutores.map((i) => (
-                    <option key={i.id_instrutor} value={i.id_instrutor}>{i.nome}</option>
+                    <option key={i.id_instrutor} value={i.id_instrutor}>{i.nome_completo}</option>
                   ))}
                 </select>
               </div>

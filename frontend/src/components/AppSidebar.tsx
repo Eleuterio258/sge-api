@@ -17,16 +17,23 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { icon: Home, label: 'Dashboard', id: 'dashboard', to: '/local-admin/dashboard', roles: [2, 1] },
+  // Itens para Super Admin
+  { icon: Home, label: 'Dashboard', id: 'dashboard', to: '/admin/dashboard', roles: [1] },
+  { icon: Users, label: 'Estudantes', id: 'students', to: '/admin/student-managements', roles: [1] },
+  { icon: Car, label: 'Veículos', id: 'vehicles', to: '/admin/vehicles', roles: [1] },
+  { icon: Calendar, label: 'Aulas', id: 'lessons', to: '/admin/lessons', roles: [1] },
+  { icon: GraduationCap, label: 'Instrutores', id: 'instructors', to: '/admin/instructors', roles: [1] },
+  { icon: Building, label: 'Gestão de Escolas', id: 'schools-management', to: '/admin/schools', roles: [1] },
+  { icon: Users, label: 'Gestão de Usuários', id: 'users-management', to: '/admin/users', roles: [1] },
+  { icon: LinkIcon, label: 'Atribuição Usuários-Escolas', id: 'user-school-assignment', to: '/admin/user-school-assignment', roles: [1] },
+  { icon: BarChart3, label: 'Relatórios', id: 'system-reports', to: '/admin/reports', roles: [1] },
+
+  // Itens para Admin Local
+  { icon: Home, label: 'Dashboard', id: 'dashboard', to: '/local-admin/dashboard', roles: [2] },
   { icon: Users, label: 'Estudantes', id: 'students', to: '/local-admin/students', roles: [2] },
   { icon: Car, label: 'Veículos', id: 'vehicles', to: '/local-admin/vehicles', roles: [2] },
   { icon: Calendar, label: 'Aulas', id: 'lessons', to: '/local-admin/lessons', roles: [2] },
   { icon: GraduationCap, label: 'Instrutores', id: 'instructors', to: '/local-admin/instructors', roles: [2] },
-  { icon: Building, label: 'Gestão de Escolas', id: 'schools-management', to: '/admin/schools', roles: [1] },
-  // Itens exclusivos do Super Admin
-  { icon: GraduationCap, label: 'Instrutores', id: 'instructors', to: '/instructor/dashboard', roles: [1] },
-  { icon: Users, label: 'Gestão de Usuários', id: 'users-management', to: '/admin/users', roles: [1] },
-  { icon: LinkIcon, label: 'Atribuição Usuários-Escolas', id: 'user-school-assignment', to: '/admin/user-school-assignment', roles: [1] },
 ];
 
 interface AppSidebarProps {
@@ -43,30 +50,7 @@ export function AppSidebar({
 
   const getFilteredMenuItems = () => {
     if (!user) return menuItems.filter(item => item.id === 'dashboard');
-    if (user.id_tipo_utilizador === 1) {
-      return menuItems;
-    }
-    return menuItems.filter(item => {
-      if (item.id === 'dashboard') return true;
-      if (item.roles && !item.roles.includes(user.id_tipo_utilizador)) return false;
-      const resourceMap: Record<string, string> = {
-        students: 'students',
-        instructors: 'instructors',
-        vehicles: 'vehicles',
-        lessons: 'lessons',
-        payments: 'payments',
-        enrollments: 'students',
-        reports: 'reports',
-        settings: 'users',
-        'users-management': 'users',
-        'schools-management': 'schools',
-        'system-reports': 'reports',
-        'user-school-assignment': 'schools',
-      };
-      const resource = resourceMap[item.id];
-      if (!resource) return false;
-      return canAccess(resource);
-    });
+    return menuItems.filter(item => item.roles && item.roles.includes(user.id_tipo_utilizador));
   };
 
   const filteredItems = getFilteredMenuItems();

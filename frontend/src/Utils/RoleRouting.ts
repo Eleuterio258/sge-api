@@ -1,5 +1,5 @@
 // utils/roleRouting.ts
-import { UserRole, ROLE_ROUTES, ROLE_NAMES } from '@/types/auth';
+import { UserRole, ROLE_ROUTES, ROLE_NAMES } from '../types/auth';
 
 export const getRoleBasedRoute = (userRole: UserRole): string => {
   return ROLE_ROUTES[userRole] || '/dashboard';
