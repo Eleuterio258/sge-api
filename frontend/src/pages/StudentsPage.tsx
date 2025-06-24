@@ -11,7 +11,7 @@ interface Aluno {
   id_escola?: number | string;
 }
 
-const API_URL = "http://localhost:4000/api/alunos";
+const API_URL = "http://135.181.249.37:4000/api/alunos";
 
 const StudentsPage: React.FC = () => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);

@@ -36,13 +36,13 @@ export function MatriculaForm({ onSuccess, initialAlunoId }: { onSuccess?: () =>
 
   useEffect(() => {
     if (!accessToken) return;
-    axios.get<Aluno[]>("http://localhost:4000/api/alunos", {
+    axios.get<Aluno[]>("http://135.181.249.37:4000/api/alunos", {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(res => setAlunos(res.data));
-    axios.get<Escola[]>("http://localhost:4000/api/escolas", {
+    axios.get<Escola[]>("http://135.181.249.37:4000/api/escolas", {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(res => setEscolas(res.data));
-    axios.get<CategoriaCarta[]>("http://localhost:4000/api/categorias-carta", {
+    axios.get<CategoriaCarta[]>("http://135.181.249.37:4000/api/categorias-carta", {
       headers: { Authorization: `Bearer ${accessToken}` }
     }).then(res => setCategorias(res.data));
   }, [accessToken]);
@@ -64,7 +64,7 @@ export function MatriculaForm({ onSuccess, initialAlunoId }: { onSuccess?: () =>
     setError(null);
     setSuccess(null);
     try {
-      await axios.post("http://localhost:4000/api/matriculas", {
+      await axios.post("http://135.181.249.37:4000/api/matriculas", {
         ...form,
         id_aluno: Number(form.id_aluno),
         id_escola: Number(form.id_escola),

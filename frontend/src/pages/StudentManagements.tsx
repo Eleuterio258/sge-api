@@ -34,7 +34,7 @@ interface NovoAluno {
   foto_url?: string;
 }
 
-const API_URL = "http://localhost:4000/api/alunos";
+const API_URL = "http://135.181.249.37:4000/api/alunos";
 
 const StudentManagements: React.FC = () => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -103,7 +103,7 @@ const StudentManagements: React.FC = () => {
     formData.append("file", file);
     try {
       // Substitua a URL abaixo pela rota real de upload se existir
-      const res = await axios.post("http://localhost:4000/api/uploads", formData, {
+      const res = await axios.post("http://135.181.249.37:4000/api/uploads", formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",

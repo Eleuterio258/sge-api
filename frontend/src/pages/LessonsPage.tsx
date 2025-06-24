@@ -13,7 +13,7 @@ interface Aula {
   id_escola?: number | string;
 }
 
-const API_URL = "http://localhost:4000/api/aulas";
+const API_URL = "http://135.181.249.37:4000/api/aulas";
 
 const LessonsPage: React.FC = () => {
   const [aulas, setAulas] = useState<Aula[]>([]);
