@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
 import { MOCK_SCHOOLS } from '@/types/auth';
 import { 
   Users, 
@@ -13,7 +14,10 @@ import {
 } from 'lucide-react';
 
 export default function SuperAdminDashboard() {
-  const { user, getCurrentUserSchool } = useAuth();
+  const { user, getCurrentUserSchool, apiClient } = useAuth();
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [statsError, setStatsError] = useState<string | null>(null);
   
   const getSchoolName = (schoolId: string) => {
     const school = MOCK_SCHOOLS.find(s => s.id === schoolId);
@@ -23,13 +27,32 @@ export default function SuperAdminDashboard() {
   const currentUserSchool = getCurrentUserSchool();
   const currentSchoolName = currentUserSchool ? getSchoolName(currentUserSchool) : 'Todas as Escolas';
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (user?.id_tipo_utilizador === 1) {
+        setLoadingStats(true);
+        setStatsError(null);
+        try {
+          const response = await apiClient.get('/escolas/dashboard/geral');
+          setDashboardStats(response.data);
+        } catch (err: any) {
+          setStatsError('Erro ao buscar estatísticas reais do dashboard.');
+        } finally {
+          setLoadingStats(false);
+        }
+      }
+    };
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const getStatsForCurrentUser = () => {
-    if (user?.id_tipo_utilizador === 1) { // Super Admin
+    if (user?.id_tipo_utilizador === 1 && dashboardStats) {
       return {
-        students: '247',
-        instructors: '18',
-        vehicles: '12',
-        revenue: 'MT 45.230'
+        students: dashboardStats.total_alunos?.toString() ?? '0',
+        instructors: '-', // Not provided by backend
+        vehicles: '-',    // Not provided by backend
+        revenue: `MT ${dashboardStats.total_pago ?? 0}`
       };
     } else if (currentUserSchool === 'escola-1') {
       return {

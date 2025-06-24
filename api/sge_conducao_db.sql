@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `escola_utilizadores` (
   KEY `id_utilizador` (`id_utilizador`),
   CONSTRAINT `escola_utilizadores_ibfk_1` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
   CONSTRAINT `escola_utilizadores_ibfk_2` FOREIGN KEY (`id_utilizador`) REFERENCES `utilizadores` (`id_utilizador`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `exames` (
   `id_exame` int NOT NULL AUTO_INCREMENT,
@@ -111,6 +111,20 @@ CREATE TABLE IF NOT EXISTS `exames` (
   PRIMARY KEY (`id_exame`),
   UNIQUE KEY `id_matricula` (`id_matricula`,`tipo_exame`,`numero_tentativa`),
   CONSTRAINT `exames_ibfk_1` FOREIGN KEY (`id_matricula`) REFERENCES `matriculas` (`id_matricula`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `instrutores` (
+  `id_instrutor` int NOT NULL AUTO_INCREMENT,
+  `id_utilizador` int NOT NULL,
+  `cnh` varchar(50) DEFAULT NULL,
+  `categoria_cnh` varchar(10) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `id_escola` int DEFAULT NULL,
+  PRIMARY KEY (`id_instrutor`),
+  UNIQUE KEY `id_utilizador` (`id_utilizador`),
+  KEY `fk_instrutor_escola` (`id_escola`),
+  CONSTRAINT `fk_instrutor_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
+  CONSTRAINT `fk_instrutor_utilizador` FOREIGN KEY (`id_utilizador`) REFERENCES `utilizadores` (`id_utilizador`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `matriculas` (
@@ -180,7 +194,7 @@ CREATE TABLE IF NOT EXISTS `refresh_tokens` (
   KEY `id_utilizador` (`id_utilizador`),
   KEY `token` (`token`),
   CONSTRAINT `refresh_tokens_ibfk_1` FOREIGN KEY (`id_utilizador`) REFERENCES `utilizadores` (`id_utilizador`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `tiposutilizador` (
   `id_tipo_utilizador` int NOT NULL AUTO_INCREMENT,
@@ -204,25 +218,24 @@ CREATE TABLE IF NOT EXISTS `utilizadores` (
   UNIQUE KEY `email` (`email`),
   KEY `id_tipo_utilizador` (`id_tipo_utilizador`),
   CONSTRAINT `utilizadores_ibfk_1` FOREIGN KEY (`id_tipo_utilizador`) REFERENCES `tiposutilizador` (`id_tipo_utilizador`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Tabela de Veículos
-CREATE TABLE IF NOT EXISTS veiculos (
-  id_veiculo INT NOT NULL AUTO_INCREMENT,
-  placa VARCHAR(20) NOT NULL,
-  modelo VARCHAR(100) NOT NULL,
-  marca VARCHAR(100) NOT NULL,
-  ano INT NOT NULL,
-  categoria VARCHAR(50) NOT NULL,
-  id_escola INT NOT NULL,
-  id_instrutor INT DEFAULT NULL,
-  PRIMARY KEY (id_veiculo),
-  UNIQUE KEY (placa),
-  KEY (id_escola),
-  KEY (id_instrutor),
-  CONSTRAINT fk_veiculo_escola FOREIGN KEY (id_escola) REFERENCES escolas(id_escola),
-  CONSTRAINT fk_veiculo_instrutor FOREIGN KEY (id_instrutor) REFERENCES utilizadores(id_utilizador)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `veiculos` (
+  `id_veiculo` int NOT NULL AUTO_INCREMENT,
+  `placa` varchar(20) NOT NULL,
+  `modelo` varchar(100) NOT NULL,
+  `marca` varchar(100) NOT NULL,
+  `ano` int NOT NULL,
+  `categoria` varchar(50) NOT NULL,
+  `id_escola` int NOT NULL,
+  `id_instrutor` int DEFAULT NULL,
+  PRIMARY KEY (`id_veiculo`),
+  UNIQUE KEY `placa` (`placa`),
+  KEY `id_escola` (`id_escola`),
+  KEY `id_instrutor` (`id_instrutor`),
+  CONSTRAINT `fk_veiculo_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
+  CONSTRAINT `fk_veiculo_instrutor` FOREIGN KEY (`id_instrutor`) REFERENCES `utilizadores` (`id_utilizador`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
