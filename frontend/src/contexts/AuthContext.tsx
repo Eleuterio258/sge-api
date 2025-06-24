@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { User, AuthContextType, LoginResponse, UserRole } from '../types/auth';
-import { useNavigation } from '@/hooks/useNavigation';
+import { useNavigation } from '@/hooks/UseNavigation';
  
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -358,44 +358,43 @@ return context;
 }
 
 export function useAuthenticatedRequest() {
-const { apiClient, accessToken, isTokenValid } = useAuth();
+  const { apiClient, accessToken, isTokenValid } = useAuth();
 
-const request = async <T>(config: any): Promise<T> => {
-  if (!accessToken || !isTokenValid()) {
-    throw new Error('Token inválido ou expirado. Faça login novamente.');
-  }
-
-  try {
-    // Garantir que o token está nos headers
-    if (!config.headers) {
-      config.headers = {};
+  const request = async (config: any) => {
+    if (!accessToken || !isTokenValid()) {
+      throw new Error('Token inválido ou expirado. Faça login novamente.');
     }
-    config.headers.Authorization = `Bearer ${accessToken}`;
-    
-    const response = await apiClient(config);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response) {
-        const status = error.response.status;
-        if (status === 401) {
-          throw new Error('Não autorizado. Faça login novamente.');
-        } else if (status === 403) {
-          throw new Error('Acesso negado. Você não tem permissão para esta ação.');
-        } else if (status === 404) {
-          throw new Error('Recurso não encontrado.');
-        } else if (status >= 500) {
-          throw new Error('Erro no servidor. Tente novamente mais tarde.');
-        }
-      } else if (error.code === 'ECONNABORTED') {
-        throw new Error('Tempo limite de conexão esgotado.');
-      } else if (error.message === 'Network Error') {
-        throw new Error('Erro de rede. Verifique sua conexão.');
+
+    try {
+      if (!config.headers) {
+        config.headers = {};
       }
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+      
+      const response = await apiClient(config);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const status = error.response.status;
+          if (status === 401) {
+            throw new Error('Não autorizado. Faça login novamente.');
+          } else if (status === 403) {
+            throw new Error('Acesso negado. Você não tem permissão para esta ação.');
+          } else if (status === 404) {
+            throw new Error('Recurso não encontrado.');
+          } else if (status >= 500) {
+            throw new Error('Erro no servidor. Tente novamente mais tarde.');
+          }
+        } else if (error.code === 'ECONNABORTED') {
+          throw new Error('Tempo limite de conexão esgotado.');
+        } else if (error.message === 'Network Error') {
+          throw new Error('Erro de rede. Verifique sua conexão.');
+        }
+      }
+      throw new Error('Erro inesperado ao fazer requisição autenticada.');
     }
-    throw new Error('Erro inesperado ao fazer requisição autenticada.');
-  }
-};
+  };
 
-return { request, apiClient };
+  return { request, apiClient };
 }

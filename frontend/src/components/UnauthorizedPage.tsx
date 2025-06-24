@@ -1,6 +1,6 @@
 // components/UnauthorizedPage.tsx
 import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
-import { useNavigation } from '../hooks/useNavigation';
+import { useNavigation } from '../hooks/UseNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { getRoleBasedRoute } from '../utils/roleRouting';
 
