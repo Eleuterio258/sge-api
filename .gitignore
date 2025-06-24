@@ -12,14 +12,11 @@ yarn-error.log*
 logs
 *.log
 
-# dotenv
-.env
-.env.*
+
 
 # Docker
 *.local
-Dockerfile*
-docker-compose*
+ 
 
 # VSCode
 .vscode/
