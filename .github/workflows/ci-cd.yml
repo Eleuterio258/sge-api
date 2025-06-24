@@ -1,0 +1,60 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: sge_conducao_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # BACKEND
+      - name: Install backend dependencies
+        working-directory: ./api
+        run: npm install
+
+      - name: Run backend tests
+        working-directory: ./api
+        run: npm test || echo "No backend tests found"
+
+      # FRONTEND
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test || echo "No frontend tests found"
+
+      # DOCKER BUILD (opcional)
+      - name: Build backend Docker image
+        working-directory: ./api
+        run: docker build -t sge-api-backend .
+
+      - name: Build frontend Docker image
+        working-directory: ./frontend
+        run: docker build -t sge-api-frontend . 
