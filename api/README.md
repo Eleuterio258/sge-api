@@ -35,7 +35,7 @@ Esta é a API RESTful para o Sistema de Gestão Escolar (SGE) de escolas de Cond
 3.  Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis de ambiente:
     ```
     PORT=4000
-    DB_HOST=localhost
+    DB_HOST=135.181.249.37
     DB_USER=root
     DB_PASSWORD=password
     DB_NAME=sge_conducao
@@ -53,7 +53,7 @@ Para iniciar o servidor da API:
 node index.js
 ```
 
-O servidor estará rodando em `http://localhost:4000` (ou na porta especificada em `.env`).
+O servidor estará rodando em `http://135.181.249.37:4000` (ou na porta especificada em `.env`).
 
 ## Estrutura do Projeto
 
@@ -190,7 +190,7 @@ Para o middleware `authorizeRoles`, os seguintes IDs de tipo de usuário são us
 ### Registrar um novo usuário (Super Admin)
 
 ```bash
-curl -X POST http://localhost:4000/api/auth/register \
+curl -X POST http://135.181.249.37:4000/api/auth/register \
 -H "Content-Type: application/json" \
 -d 
 ```
@@ -209,7 +209,7 @@ curl -X POST http://localhost:4000/api/auth/register \
 ### Fazer Login
 
 ```bash
-curl -X POST http://localhost:4000/api/auth/login \
+curl -X POST http://135.181.249.37:4000/api/auth/login \
 -H "Content-Type: application/json" \
 -d 
 ```

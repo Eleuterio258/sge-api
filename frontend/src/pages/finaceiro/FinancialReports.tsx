@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:4000/api', // Troque para 3000 se necessário
+  baseURL: 'http://135.181.249.37:4000/api', // Troque para 3000 se necessário
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

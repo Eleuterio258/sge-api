@@ -13,7 +13,7 @@ interface Veiculo {
   id_escola?: number | string;
 }
 
-const API_URL = "http://localhost:4000/api/veiculos";
+const API_URL = "http://135.181.249.37:4000/api/veiculos";
 
 const VehiclesPage: React.FC = () => {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);

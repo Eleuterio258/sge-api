@@ -4,7 +4,7 @@
 As credenciais do banco de dados devem ser configuradas no arquivo `.env` na raiz do projeto. Exemplo:
 
 ```
-DB_HOST=localhost
+DB_HOST=135.181.249.37
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 DB_NAME=nome_do_banco

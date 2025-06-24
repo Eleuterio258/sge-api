@@ -125,10 +125,10 @@ interface DetalhesPagamento {
   registado_por: number;
 }
 
-const API_URL = "http://localhost:4000/api/alunos";
-const MATRICULAS_API_URL = "http://localhost:4000/api/matriculas";
-const ESCOLAS_API_URL = "http://localhost:4000/api/escolas";
-const CATEGORIAS_API_URL = "http://localhost:4000/api/categorias-carta";
+const API_URL = "http://135.181.249.37:4000/api/alunos";
+const MATRICULAS_API_URL = "http://135.181.249.37:4000/api/matriculas";
+const ESCOLAS_API_URL = "http://135.181.249.37:4000/api/escolas";
+const CATEGORIAS_API_URL = "http://135.181.249.37:4000/api/categorias-carta";
 
 const StudentManagementsDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -352,7 +352,7 @@ const StudentManagementsDetails: React.FC = () => {
     }
     
     try {
-      const response = await axios.post('http://localhost:4000/api/pagamentos', dadosPagamento, {
+      const response = await axios.post('http://135.181.249.37:4000/api/pagamentos', dadosPagamento, {
         headers: { 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'

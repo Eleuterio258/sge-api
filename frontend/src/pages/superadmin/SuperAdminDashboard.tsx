@@ -91,7 +91,7 @@ export default function SuperAdminDashboard() {
   // Create axios instance with configuration
   const createAxiosInstance = () => {
     return axios.create({
-      baseURL: 'http://localhost:4000/api',
+      baseURL: 'http://135.181.249.37:4000/api',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
