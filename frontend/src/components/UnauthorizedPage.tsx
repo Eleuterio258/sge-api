@@ -2,7 +2,7 @@
 import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
 import { useNavigation } from '../hooks/UseNavigation';
 import { useAuth } from '../contexts/AuthContext';
-import { getRoleBasedRoute } from '../utils/roleRouting';
+import { getRoleBasedRoute } from '@/Utils/RoleRouting';
 
 export default function UnauthorizedPage() {
   const { goBack, navigate } = useNavigation();
