@@ -9,6 +9,17 @@ services:
       - "4000:4000"
     environment:
       - NODE_ENV=production
+      - JWT_SECRET=sge_conducao_jwt_secret_key_2024_very_secure_and_long_key_for_production
+      - JWT_EXPIRES_IN=360d
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - DB_HOST=135.181.249.37
+      - DB_USER=root
+      - DB_PASSWORD=Maputo2023@#
+      - DB_NAME=sge_conducao
+      - DB_PORT=3306
+      - CORS_ORIGIN=*
+      - MAX_FILE_SIZE=5242880
+      - UPLOAD_PATH=./uploads
     restart: always
     # depends_on:
     #   - db # Descomente se usar banco em container
