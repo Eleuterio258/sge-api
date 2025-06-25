@@ -42,66 +42,34 @@ interface NovoAluno {
 
 // Utilitários de validação para documentos moçambicanos
 const validationUtils = {
-  validateBI: (bi: string): { isValid: boolean; message?: string } => {
-    const cleanBI = bi.replace(/\s+/g, '').toUpperCase();
-    const biRegex = /^[0-9]{12}[A-Z]$/;
-    
-    if (!cleanBI) {
-      return { isValid: false, message: "BI é obrigatório" };
-    }
-    
-    if (cleanBI.length !== 13) {
-      return { isValid: false, message: "BI deve ter 13 caracteres (12 números + 1 letra)" };
-    }
-    
-    if (!biRegex.test(cleanBI)) {
-      return { isValid: false, message: "Formato inválido. Use: 120000000123A" };
-    }
-    
-    const numbers = cleanBI.slice(0, 12);
-    const checkLetter = cleanBI.slice(12);
-    
-    let sum = 0;
-    for (let i = 0; i < 12; i++) {
-      sum += parseInt(numbers[i]) * (13 - i);
-    }
-    
-    const remainder = sum % 23;
-    const expectedLetter = String.fromCharCode(65 + remainder);
-    
-    if (checkLetter !== expectedLetter) {
-      return { isValid: false, message: "Número de BI inválido (dígito verificador incorreto)" };
-    }
-    
-    return { isValid: true };
-  },
+
 
   validatePassport: (passport: string): { isValid: boolean; message?: string } => {
     const cleanPassport = passport.replace(/\s+/g, '').toUpperCase();
-    
+
     if (!cleanPassport) {
       return { isValid: false, message: "Número do passaporte é obrigatório" };
     }
-    
+
     const oldFormatRegex = /^[A-Z][0-9]{6}$/;
     const newFormatRegex = /^[A-Z]{2}[0-9]{7}$/;
     const biometricRegex = /^MP[0-9]{6}$/;
-    
+
     if (oldFormatRegex.test(cleanPassport)) {
       return { isValid: true };
     }
-    
+
     if (newFormatRegex.test(cleanPassport)) {
       return { isValid: true };
     }
-    
+
     if (biometricRegex.test(cleanPassport)) {
       return { isValid: true };
     }
-    
-    return { 
-      isValid: false, 
-      message: "Formato inválido. Use: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)" 
+
+    return {
+      isValid: false,
+      message: "Formato inválido. Use: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)"
     };
   },
 
@@ -125,7 +93,7 @@ const StudentManagements = () => {
   const [showNovoAluno, setShowNovoAluno] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [previewFoto, setPreviewFoto] = useState<string>("");
-  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
   const [novoAluno, setNovoAluno] = useState<NovoAluno>({
     id_escola: 1,
     numero_ficha: "",
@@ -162,9 +130,9 @@ const StudentManagements = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       console.log("Buscando alunos...");
-      
+
       const response = await axios.get(API_URL, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -183,7 +151,7 @@ const StudentManagements = () => {
       }
     } catch (err: any) {
       console.error("Erro ao buscar alunos:", err);
-      
+
       if (err.response?.status === 401) {
         setError("Sessão expirada. Faça login novamente.");
       } else {
@@ -208,9 +176,9 @@ const StudentManagements = () => {
 
   const handleNovoAlunoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     let formattedValue = value;
-    
+
     if (name === 'numero_identificacao') {
       if (novoAluno.tipo_identificacao === 'BI') {
         formattedValue = validationUtils.formatBI(value);
@@ -218,9 +186,9 @@ const StudentManagements = () => {
         formattedValue = validationUtils.formatPassport(value);
       }
     }
-    
+
     setNovoAluno((prev) => ({ ...prev, [name]: formattedValue }));
-    
+
     if (validationErrors[name]) {
       setValidationErrors(prev => {
         const newErrors = { ...prev };
@@ -230,22 +198,7 @@ const StudentManagements = () => {
     }
   };
 
-  const validateIdentificationNumber = useCallback((tipo: string, numero: string): string | null => {
-    if (!numero.trim()) return null;
-    
-    switch (tipo) {
-      case 'BI':
-        const biValidation = validationUtils.validateBI(numero);
-        return biValidation.isValid ? null : biValidation.message || "BI inválido";
-        
-      case 'Passaporte':
-        const passportValidation = validationUtils.validatePassport(numero);
-        return passportValidation.isValid ? null : passportValidation.message || "Passaporte inválido";
-        
-      default:
-        return null;
-    }
-  }, []);
+  ;
 
   const handleFotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -287,9 +240,9 @@ const StudentManagements = () => {
     }
   };
 
-  const validateForm = (data: NovoAluno): { isValid: boolean; errors: {[key: string]: string} } => {
-    const errors: {[key: string]: string} = {};
-    
+  const validateForm = (data: NovoAluno): { isValid: boolean; errors: { [key: string]: string } } => {
+    const errors: { [key: string]: string } = {};
+
     if (!data.nome_completo.trim()) errors.nome_completo = "Nome completo é obrigatório";
     if (!data.email.trim()) errors.email = "Email é obrigatório";
     if (!data.numero_ficha.trim()) errors.numero_ficha = "Número da ficha é obrigatório";
@@ -298,39 +251,36 @@ const StudentManagements = () => {
     if (!data.estado_civil) errors.estado_civil = "Estado civil é obrigatório";
     if (!data.tipo_identificacao) errors.tipo_identificacao = "Tipo de identificação é obrigatório";
     if (!data.pais_origem) errors.pais_origem = "País de origem é obrigatório";
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (data.email && !emailRegex.test(data.email)) {
       errors.email = "Email inválido";
     }
-    
+
     if (data.tipo_identificacao && data.numero_identificacao) {
-      const identificationError = validateIdentificationNumber(data.tipo_identificacao, data.numero_identificacao);
-      if (identificationError) {
-        errors.numero_identificacao = identificationError;
-      }
-    } else if (data.tipo_identificacao) {
+
+
       errors.numero_identificacao = "Número de identificação é obrigatório";
     }
-    
+
     if (data.data_nascimento) {
       const birthDate = new Date(data.data_nascimento);
       const today = new Date();
       if (birthDate > today) {
         errors.data_nascimento = "Data de nascimento não pode ser futura";
       }
-      
+
       const age = today.getFullYear() - birthDate.getFullYear();
       if (age < 5) {
         errors.data_nascimento = "Idade mínima é 5 anos";
       }
     }
-    
+
     const phoneRegex = /^(\+258|258)?[2-8][0-9]{7,8}$/;
     if (data.telefone_principal && !phoneRegex.test(data.telefone_principal.replace(/\s+/g, ''))) {
       errors.telefone_principal = "Formato inválido. Use: +258123456789 ou 258123456789";
     }
-    
+
     return {
       isValid: Object.keys(errors).length === 0,
       errors
@@ -360,9 +310,9 @@ const StudentManagements = () => {
       genero: "",
       foto_url: ""
     });
-    
+
     setValidationErrors({});
-    
+
     if (previewFoto && previewFoto.startsWith('blob:')) {
       URL.revokeObjectURL(previewFoto);
     }
@@ -371,14 +321,14 @@ const StudentManagements = () => {
 
   const handleNovoAlunoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validation = validateForm(novoAluno);
     if (!validation.isValid) {
       setValidationErrors(validation.errors);
       setError("Por favor, corrija os erros no formulário");
       return;
     }
-    
+
     setSubmitting(true);
     setError(null);
     setValidationErrors({});
@@ -396,12 +346,12 @@ const StudentManagements = () => {
       console.log("Aluno criado com sucesso");
       setShowNovoAluno(false);
       resetNovoAlunoForm();
-      
+
       await fetchStudents();
 
     } catch (err: any) {
       console.error("Erro ao criar aluno:", err);
-      
+
       if (err.response?.status === 401) {
         setError("Sessão expirada. Faça login novamente.");
       } else if (err.response?.status === 409) {
@@ -499,9 +449,9 @@ const StudentManagements = () => {
                       }
                     >
                       <td className="border px-4 py-2">
-                        {aluno.foto_url && 
-                         aluno.foto_url !== "http://example.com/aluno.jpg" && 
-                         aluno.foto_url !== "http://example.com/maria.jpg" ? (
+                        {aluno.foto_url &&
+                          aluno.foto_url !== "http://example.com/aluno.jpg" &&
+                          aluno.foto_url !== "http://example.com/maria.jpg" ? (
                           <img
                             src={aluno.foto_url}
                             alt={aluno.nome_completo}
@@ -583,9 +533,8 @@ const StudentManagements = () => {
                         name="numero_ficha"
                         value={novoAluno.numero_ficha}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.numero_ficha ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.numero_ficha ? 'border-red-500' : ''
+                          }`}
                         placeholder="Número da Ficha"
                         required
                       />
@@ -599,9 +548,8 @@ const StudentManagements = () => {
                         name="nome_completo"
                         value={novoAluno.nome_completo}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.nome_completo ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.nome_completo ? 'border-red-500' : ''
+                          }`}
                         placeholder="Nome Completo"
                         required
                       />
@@ -626,9 +574,8 @@ const StudentManagements = () => {
                         type="date"
                         value={novoAluno.data_nascimento}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.data_nascimento ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.data_nascimento ? 'border-red-500' : ''
+                          }`}
                         required
                       />
                       {validationErrors.data_nascimento && (
@@ -641,9 +588,8 @@ const StudentManagements = () => {
                         name="estado_civil"
                         value={novoAluno.estado_civil}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.estado_civil ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.estado_civil ? 'border-red-500' : ''
+                          }`}
                         required
                       >
                         <option value="">Estado Civil</option>
@@ -692,9 +638,8 @@ const StudentManagements = () => {
                         name="tipo_identificacao"
                         value={novoAluno.tipo_identificacao}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.tipo_identificacao ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.tipo_identificacao ? 'border-red-500' : ''
+                          }`}
                         required
                       >
                         <option value="">Tipo de Identificação</option>
@@ -713,210 +658,205 @@ const StudentManagements = () => {
                         name="numero_identificacao"
                         value={novoAluno.numero_identificacao}
                         onChange={handleNovoAlunoChange}
-                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                          validationErrors.numero_identificacao ? 'border-red-500' : ''
-                        }`}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.numero_identificacao ? 'border-red-500' : ''
+                          }`}
                         placeholder={
-                          novoAluno.tipo_identificacao === 'BI' 
-                            ? "120000000123A" 
+                          novoAluno.tipo_identificacao === 'BI'
+                            ? "120000000123A"
                             : novoAluno.tipo_identificacao === 'Passaporte'
-                            ? "A123456 ou AB1234567"
-                            : "Número de Identificação"
-                          }
-                          maxLength={
-                            novoAluno.tipo_identificacao === 'BI' ? 13 : 
-                            novoAluno.tipo_identificacao === 'Passaporte' ? 9 : 
-                            undefined
-                          }
-                        />
-                        {validationErrors.numero_identificacao && (
-                          <p className="text-red-500 text-xs mt-1">{validationErrors.numero_identificacao}</p>
-                        )}
-                        {novoAluno.tipo_identificacao === 'BI' && (
-                          <p className="text-gray-500 text-xs mt-1">
-                            Formato: 12 dígitos + 1 letra (ex: 120000000123A)
-                          </p>
-                        )}
-                        {novoAluno.tipo_identificacao === 'Passaporte' && (
-                          <p className="text-gray-500 text-xs mt-1">
-                            Formato: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)
-                          </p>
-                        )}
-                      </div>
-   
-                      <div>
-                        <select
-                          name="pais_origem"
-                          value={novoAluno.pais_origem}
-                          onChange={handleNovoAlunoChange}
-                          className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                            validationErrors.pais_origem ? 'border-red-500' : ''
-                          }`}
-                          required
-                        >
-                          <option value="">País de Origem</option>
-                          <option value="Moçambique">Moçambique</option>
-                          <option value="África do Sul">África do Sul</option>
-                          <option value="Zimbabwe">Zimbabwe</option>
-                          <option value="Malawi">Malawi</option>
-                          <option value="Tanzânia">Tanzânia</option>
-                          <option value="Zambia">Zambia</option>
-                          <option value="Portugal">Portugal</option>
-                          <option value="Brasil">Brasil</option>
-                          <option value="Outro">Outro</option>
-                        </select>
-                        {validationErrors.pais_origem && (
-                          <p className="text-red-500 text-xs mt-1">{validationErrors.pais_origem}</p>
-                        )}
-                      </div>
-   
-                      <div>
-                        <input
-                          name="profissao"
-                          value={novoAluno.profissao}
-                          onChange={handleNovoAlunoChange}
-                          className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
-                          placeholder="Profissão"
-                        />
-                      </div>
-   
-                      <div>
-                        <input
-                          name="endereco"
-                          value={novoAluno.endereco}
-                          onChange={handleNovoAlunoChange}
-                          className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
-                          placeholder="Endereço"
-                        />
-                      </div>
-   
-                      <div>
-                        <input
-                          name="numero_casa"
-                          value={novoAluno.numero_casa}
-                          onChange={handleNovoAlunoChange}
-                          className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
-                          placeholder="Número da Casa"
-                        />
-                      </div>
-   
-                      <div>
-                        <input
-                          name="telefone_principal"
-                          value={novoAluno.telefone_principal}
-                          onChange={handleNovoAlunoChange}
-                          className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                            validationErrors.telefone_principal ? 'border-red-500' : ''
-                          }`}
-                          placeholder="+258123456789"
-                        />
-                        {validationErrors.telefone_principal && (
-                          <p className="text-red-500 text-xs mt-1">{validationErrors.telefone_principal}</p>
-                        )}
-                        <p className="text-gray-500 text-xs mt-1">
-                          Formato: +258123456789 ou 258123456789
-                        </p>
-                      </div>
-   
-                      <div>
-                        <input
-                          name="telefone_alternativo"
-                          value={novoAluno.telefone_alternativo}
-                          onChange={handleNovoAlunoChange}
-                          className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
-                          placeholder="Telefone Alternativo"
-                        />
-                      </div>
-   
-                      <div>
-                        <input
-                          name="email"
-                          type="email"
-                          value={novoAluno.email}
-                          onChange={handleNovoAlunoChange}
-                          className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                            validationErrors.email ? 'border-red-500' : ''
-                          }`}
-                          placeholder="Email"
-                          required
-                        />
-                        {validationErrors.email && (
-                          <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
-                        )}
-                      </div>
-   
-                      <div>
-                        <select
-                          name="genero"
-                          value={novoAluno.genero}
-                          onChange={handleNovoAlunoChange}
-                          className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${
-                            validationErrors.genero ? 'border-red-500' : ''
-                          }`}
-                          required
-                        >
-                          <option value="">Selecione o Gênero</option>
-                          <option value="Masculino">Masculino</option>
-                          <option value="Feminino">Feminino</option>
-                        </select>
-                        {validationErrors.genero && (
-                          <p className="text-red-500 text-xs mt-1">{validationErrors.genero}</p>
-                        )}
-                      </div>
-                    </div>
-   
-                    <div className="border-t pt-4">
-                      <label className="block font-medium mb-2">Foto do Aluno</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFotoChange}
-                        className="p-3 border rounded-md w-full focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                              ? "A123456 ou AB1234567"
+                              : "Número de Identificação"
+                        }
+                        maxLength={
+                          novoAluno.tipo_identificacao === 'BI' ? 13 :
+                            novoAluno.tipo_identificacao === 'Passaporte' ? 9 :
+                              undefined
+                        }
                       />
-                      <p className="text-gray-500 text-xs mt-1">
-                        Tamanho máximo: 5MB. Formatos aceitos: JPEG, PNG, GIF, WebP
-                      </p>
-                      {previewFoto && (
-                        <div className="mt-3">
-                          <img
-                            src={previewFoto}
-                            alt="Preview"
-                            className="w-20 h-20 rounded-full object-cover border-2 border-primary"
-                          />
-                        </div>
+                      {validationErrors.numero_identificacao && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.numero_identificacao}</p>
+                      )}
+                      {novoAluno.tipo_identificacao === 'BI' && (
+                        <p className="text-gray-500 text-xs mt-1">
+                          Formato: 12 dígitos + 1 letra (ex: 120000000123A)
+                        </p>
+                      )}
+                      {novoAluno.tipo_identificacao === 'Passaporte' && (
+                        <p className="text-gray-500 text-xs mt-1">
+                          Formato: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)
+                        </p>
                       )}
                     </div>
-   
-                    <div className="flex gap-4 justify-end pt-6 border-t">
-                      <button
-                        type="button"
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition-colors"
-                        onClick={() => {
-                          setShowNovoAluno(false);
-                          resetNovoAlunoForm();
-                        }}
+
+                    <div>
+                      <select
+                        name="pais_origem"
+                        value={novoAluno.pais_origem}
+                        onChange={handleNovoAlunoChange}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.pais_origem ? 'border-red-500' : ''
+                          }`}
+                        required
                       >
-                        Cancelar
-                      </button>
-                      <button
-                        type="submit"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-md transition-colors flex items-center gap-2"
-                        disabled={submitting}
-                      >
-                        {submitting && (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        )}
-                        {submitting ? 'Salvando...' : 'Salvar Aluno'}
-                      </button>
+                        <option value="">País de Origem</option>
+                        <option value="Moçambique">Moçambique</option>
+                        <option value="África do Sul">África do Sul</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Malawi">Malawi</option>
+                        <option value="Tanzânia">Tanzânia</option>
+                        <option value="Zambia">Zambia</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Brasil">Brasil</option>
+                        <option value="Outro">Outro</option>
+                      </select>
+                      {validationErrors.pais_origem && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.pais_origem}</p>
+                      )}
                     </div>
-                  </form>
-                </div>
+
+                    <div>
+                      <input
+                        name="profissao"
+                        value={novoAluno.profissao}
+                        onChange={handleNovoAlunoChange}
+                        className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
+                        placeholder="Profissão"
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        name="endereco"
+                        value={novoAluno.endereco}
+                        onChange={handleNovoAlunoChange}
+                        className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
+                        placeholder="Endereço"
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        name="numero_casa"
+                        value={novoAluno.numero_casa}
+                        onChange={handleNovoAlunoChange}
+                        className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
+                        placeholder="Número da Casa"
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        name="telefone_principal"
+                        value={novoAluno.telefone_principal}
+                        onChange={handleNovoAlunoChange}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.telefone_principal ? 'border-red-500' : ''
+                          }`}
+                        placeholder="+258123456789"
+                      />
+                      {validationErrors.telefone_principal && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.telefone_principal}</p>
+                      )}
+                      <p className="text-gray-500 text-xs mt-1">
+                        Formato: +258123456789 ou 258123456789
+                      </p>
+                    </div>
+
+                    <div>
+                      <input
+                        name="telefone_alternativo"
+                        value={novoAluno.telefone_alternativo}
+                        onChange={handleNovoAlunoChange}
+                        className="p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full"
+                        placeholder="Telefone Alternativo"
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        name="email"
+                        type="email"
+                        value={novoAluno.email}
+                        onChange={handleNovoAlunoChange}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.email ? 'border-red-500' : ''
+                          }`}
+                        placeholder="Email"
+                        required
+                      />
+                      {validationErrors.email && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <select
+                        name="genero"
+                        value={novoAluno.genero}
+                        onChange={handleNovoAlunoChange}
+                        className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.genero ? 'border-red-500' : ''
+                          }`}
+                        required
+                      >
+                        <option value="">Selecione o Gênero</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                      </select>
+                      {validationErrors.genero && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.genero}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <label className="block font-medium mb-2">Foto do Aluno</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFotoChange}
+                      className="p-3 border rounded-md w-full focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Tamanho máximo: 5MB. Formatos aceitos: JPEG, PNG, GIF, WebP
+                    </p>
+                    {previewFoto && (
+                      <div className="mt-3">
+                        <img
+                          src={previewFoto}
+                          alt="Preview"
+                          className="w-20 h-20 rounded-full object-cover border-2 border-primary"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4 justify-end pt-6 border-t">
+                    <button
+                      type="button"
+                      className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition-colors"
+                      onClick={() => {
+                        setShowNovoAluno(false);
+                        resetNovoAlunoForm();
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-md transition-colors flex items-center gap-2"
+                      disabled={submitting}
+                    >
+                      {submitting && (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      )}
+                      {submitting ? 'Salvando...' : 'Salvar Aluno'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    );
-   };
-   
-   export default StudentManagements;
+    </div>
+  );
+};
+
+export default StudentManagements;
