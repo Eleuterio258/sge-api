@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Inscrição - Escola de Condução R. Garcia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f9f7e8;
+            padding: 30px;
+            border: 2px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .photo-box {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 100px;
+            height: 120px;
+            border: 2px solid #333;
+            background-color: white;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            margin-right: 120px; /* Espaço para a foto */
+        }
+
+        .field-group {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-right: 3px;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        input[type="text"] {
+            border: none;
+            border-bottom: 1px dotted #333;
+            background: transparent;
+            padding: 1px 3px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            flex: 1;
+            min-width: 50px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-bottom: 1px solid #333;
+        }
+
+        span {
+            font-size: 14px;
+            color: #333;
+            margin: 0 3px;
+            white-space: nowrap;
+        }
+
+        /* Ajustes específicos dos campos */
+        .field-group:nth-child(1) input { /* Ficha nº */
+            max-width: 200px;
+        }
+
+        .field-group:nth-child(2) input, /* Apelido */
+        .field-group:nth-child(3) input { /* Nome */
+            min-width: 300px;
+        }
+
+        .field-group:nth-child(4) input { /* Data de Inscrição */
+            max-width: 150px;
+        }
+
+        .field-group:nth-child(5) { /* Data de Nascimento linha */
+            flex-wrap: wrap;
+        }
+
+        .field-group:nth-child(5) input:first-of-type { /* Data nascimento */
+            max-width: 80px;
+        }
+
+        .field-group:nth-child(5) input:nth-of-type(2) { /* Ano */
+            max-width: 80px;
+        }
+
+        .field-group:nth-child(5) input:nth-of-type(3) { /* Estado Civil */
+            max-width: 100px;
+        }
+
+        .field-group:nth-child(6) input { /* Filho de */
+            min-width: 150px;
+        }
+
+        .field-group:nth-child(7) input { /* Natural de */
+            min-width: 200px;
+        }
+
+        .field-group:nth-child(8) input:first-of-type { /* Distrito */
+            max-width: 150px;
+        }
+
+        .field-group:nth-child(8) input:last-of-type { /* Província */
+            min-width: 150px;
+        }
+
+        .field-group:nth-child(9) input { /* Residente em, Av. */
+            min-width: 150px;
+        }
+
+        .field-group:nth-child(10) input { /* Nº, Tel */
+            max-width: 100px;
+        }
+
+        .field-group:nth-child(11) input { /* Profissão */
+            min-width: 250px;
+        }
+
+        .field-group:nth-child(12) input:first-of-type { /* B.I. */
+            max-width: 150px;
+        }
+
+        .field-group:nth-child(12) input:nth-of-type(2) { /* Arquivo */
+            max-width: 120px;
+        }
+
+        .field-group:nth-child(12) input:last-of-type { /* Emitido em */
+            max-width: 100px;
+        }
+
+        /* Seção início do curso */
+        .inicio-curso {
+            border: 2px solid #333;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #f5f3e0;
+            margin-right: 0; /* Reset margin for this section */
+        }
+
+        .inicio-curso h2 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .curso-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .curso-left {
+            flex: 1;
+        }
+
+        .curso-left .field-group {
+            margin-bottom: 8px;
+        }
+
+        .curso-left input {
+            max-width: 120px;
+        }
+
+        .curso-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .classe-section {
+            border: 1px solid #333;
+            padding: 8px;
+            background-color: white;
+        }
+
+        .classe-section h3 {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .classe-section h4 {
+            text-align: center;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .classe-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .classe-table td {
+            border: 1px solid #333;
+            padding: 2px 4px;
+            text-align: center;
+            height: 18px;
+            vertical-align: middle;
+        }
+
+        .icon-cell {
+            width: 25px;
+            background-color: #ddd;
+        }
+
+        .categorias-section {
+            border: 1px solid #333;
+            padding: 8px;
+            background-color: white;
+        }
+
+        .categorias-section h3 {
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .categorias-section ul {
+            list-style: none;
+            font-size: 9px;
+            line-height: 1.2;
+        }
+
+        .categorias-section li {
+            margin-bottom: 1px;
+        }
+
+        /* Seção do Contrato */
+        .contrato-section {
+            margin-top: 40px;
+            margin-right: 0;
+            padding: 20px 0;
+        }
+
+        .contrato-section h2 {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .contrato-intro {
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .contrato-intro input {
+            border-bottom: 1px dotted #333;
+            background: transparent;
+            min-width: 300px;
+            margin: 0 3px;
+        }
+
+        .contrato-list {
+            margin-bottom: 30px;
+        }
+
+        .contrato-list ol {
+            list-style: none;
+            counter-reset: item;
+        }
+
+        .contrato-list li {
+            margin-bottom: 10px;
+            padding-left: 30px;
+            line-height: 1.4;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .contrato-list li::before {
+            content: counter(item, decimal) "º —";
+            counter-increment: item;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .contrato-list li input {
+            border-bottom: 1px dotted #333;
+            background: transparent;
+            width: 80px;
+            margin: 0 3px;
+        }
+
+        .assinatura-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .assinatura-box {
+            text-align: center;
+        }
+
+        .assinatura-box label {
+            display: block;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .assinatura-box input {
+            border-bottom: 1px dotted #333;
+            background: transparent;
+            width: 200px;
+            text-align: center;
+        }
+
+        /* Placeholder styling */
+        input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .photo-box {
+                position: static;
+                margin: 0 auto 20px;
+            }
+            
+            .section {
+                margin-right: 0;
+            }
+            
+            .field-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .curso-content {
+                flex-direction: column;
+            }
+            
+            .assinatura-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="photo-box"></div>
+        
+        <h1>ESCOLA DE CONDUÇÃO R. GARCIA</h1>
+        
+        <form>
+            <div class="section">
+                <div class="field-group">
+                    <label for="ficha_no">Ficha nº</label>
+                    <input type="text" id="ficha_no" name="ficha_no">
+                </div>
+                <div class="field-group">
+                    <label for="apelido">Apelido</label>
+                    <input type="text" id="apelido" name="apelido">
+                </div>
+                <div class="field-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome">
+                </div>
+                <div class="field-group">
+                    <label for="data_inscricao">Data de Inscrição</label>
+                    <input type="text" id="data_inscricao" name="data_inscricao" placeholder="............/............/............">
+                </div>
+                <div class="field-group">
+                    <label for="data_nascimento">Data de Nascimento</label>
+                    <input type="text" id="data_nascimento" name="data_nascimento" placeholder="........">
+                    <span>de</span>
+                    <input type="text" id="data_nascimento_ano" name="data_nascimento_ano" placeholder="............">
+                    <span>de</span>
+                    <input type="text" id="data_nascimento_ano2" name="data_nascimento_ano2" placeholder="............">
+                    <span>Estado Civil</span>
+                    <input type="text" id="estado_civil" name="estado_civil">
+                </div>
+                <div class="field-group">
+                    <label for="filho_de">Filho de</label>
+                    <input type="text" id="filho_de" name="filho_de">
+                    <span>e de</span>
+                    <input type="text" id="e_de" name="e_de">
+                </div>
+                <div class="field-group">
+                    <label for="natural_de">Natural de</label>
+                    <input type="text" id="natural_de" name="natural_de">
+                </div>
+                <div class="field-group">
+                    <label for="distrito">Distrito</label>
+                    <input type="text" id="distrito" name="distrito">
+                    <span>Província de</span>
+                    <input type="text" id="provincia_de" name="provincia_de">
+                </div>
+                <div class="field-group">
+                    <label for="residente_em">Residente em</label>
+                    <input type="text" id="residente_em" name="residente_em">
+                    <span>Av.</span>
+                    <input type="text" id="av" name="av">
+                </div>
+                <div class="field-group">
+                    <label for="numero">Nº</label>
+                    <input type="text" id="numero" name="numero">
+                    <span>Tel:</span>
+                    <input type="text" id="tel" name="tel">
+                    <span>/</span>
+                    <input type="text" id="tel2" name="tel2">
+                    <span>Tel nº</span>
+                    <input type="text" id="tel3" name="tel3">
+                </div>
+                <div class="field-group">
+                    <label for="profissao">Profissão</label>
+                    <input type="text" id="profissao" name="profissao">
+                </div>
+                <div class="field-group">
+                    <label for="bi_no">B.I.nº</label>
+                    <input type="text" id="bi_no" name="bi_no">
+                    <span>Arquivo de</span>
+                    <input type="text" id="arquivo_de" name="arquivo_de">
+                    <span>Emitido em</span>
+                    <input type="text" id="emitido_em" name="emitido_em" placeholder="......../......./.......">
+                </div>
+            </div>
+
+            <div class="section inicio-curso">
+                <h2>INÍCIO DO CURSO</h2>
+                <div class="curso-content">
+                    <div class="curso-left">
+                        <div class="field-group">
+                            <label for="data_curso">Data</label>
+                            <input type="text" id="data_curso" name="data_curso" placeholder="............/............/............">
+                        </div>
+                        <div class="field-group">
+                            <label for="horario">Horário:</label>
+                        </div>
+                        <div class="field-group">
+                            <label for="codigo_estrada">Código de Estrada</label>
+                            <input type="text" id="codigo_estrada" name="codigo_estrada" placeholder="........">
+                            <span>às</span>
+                            <input type="text" id="codigo_estrada_horas" name="codigo_estrada_horas" placeholder="........">
+                            <span>Horas</span>
+                        </div>
+                        <div class="field-group">
+                            <label for="conducao">Condução</label>
+                            <input type="text" id="conducao" name="conducao" placeholder="............">
+                            <span>às</span>
+                            <input type="text" id="conducao_horas" name="conducao_horas" placeholder="............">
+                            <span>Horas</span>
+                        </div>
+                    </div>
+                    
+                    <div class="curso-right">
+                        <div class="classe-section">
+                            <h3>CLASSE</h3>
+                            <h4>Códigos da Carta</h4>
+                            <table class="classe-table">
+                                <tr>
+                                    <td>A</td>
+                                    <td class="icon-cell"></td>
+                                    <td>A1</td>
+                                    <td class="icon-cell"></td>
+                                    <td>125cc</td>
+                                </tr>
+                                <tr>
+                                    <td>B</td>
+                                    <td class="icon-cell"></td>
+                                    <td></td>
+                                    <td class="icon-cell"></td>
+                                    <td>3500 KG</td>
+                                </tr>
+                                <tr>
+                                    <td>C1</td>
+                                    <td class="icon-cell"></td>
+                                    <td></td>
+                                    <td class="icon-cell"></td>
+                                    <td>4100 KG</td>
+                                </tr>
+                                <tr>
+                                    <td>C</td>
+                                    <td class="icon-cell"></td>
+                                    <td></td>
+                                    <td class="icon-cell"></td>
+                                    <td>GVM</td>
+                                </tr>
+                                <tr>
+                                    <td>BE</td>
+                                    <td class="icon-cell"></td>
+                                    <td>C1E</td>
+                                    <td class="icon-cell"></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>CE</td>
+                                    <td class="icon-cell"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="categorias-section">
+                            <h3>Categorias Prof.</h3>
+                            <ul>
+                                <li>P Passageiros</li>
+                                <li>D Carga / Gondola</li>
+                                <li>D Carga perigosa</li>
+                                <li>M1 Propulsão elétrica</li>
+                                <li>M2 Autocarro</li>
+                                <li>M3 Só tractor</li>
+                                <li>M4 Só Indústria agrícola</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DO CONTRATO (VERSO) -->
+            <div class="contrato-section">
+                <h2>CONTRATO</h2>
+                
+                <div class="contrato-intro">
+                    Eu <input type="text" name="nome_contrato">
+                    <br><br>
+                    Identifico no verso faço o contrato para o aluno de <input type="text" name="aluno_contrato">
+                    <br>
+                    e declaro que comprometo-me ao cumprimento de todas as formalidade que orientam este
+                    <br>
+                    centro de ensino, nomeadamente:
+                </div>
+                
+                <div class="contrato-list">
+                    <ol>
+                        <li>Efectuar o pagamento logo no acto da inscrição.</li>
+                        <li>Frequentar as aulas do código o mínimo 3 vezes por semana logo após a inscrição.</li>
+                        <li>Não requerer exame sem previo autorização do instrutor.</li>
+                        <li>Não faltar as aulas praticas de condução sem aviso excepto casos justificados.</li>
+                        <li>Que faltando 30 dias sem justificação nas aulas praticas de condução, o contrato é automaticamente anulado e sem direito a reembolso</li>
+                        <li>O contrato é válido por <input type="text" name="meses_contrato"> meses; contados a partir da data de inscrição.</li>
+                        <li><strong>Não aceita-se trocas nem devoluções</strong><br>
+                        Só depois de o saber sinais e regras gerais de trânsito é que o aluno iniciará a instrução<br>
+                        prática de condução.</li>
+                    </ol>
+                </div>
+
+                <div class="assinatura-section">
+                    <div class="assinatura-box">
+                        <label>Assinatura do Aluno.</label>
+                        <input type="text" name="assinatura_aluno">
+                    </div>
+                    <div class="assinatura-box">
+                        <label>Data</label>
+                        <input type="text" name="data_contrato" placeholder="........./........./........">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,6 +1,7 @@
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
@@ -12,54 +13,21 @@ USE `sge_conducao`;
 
 CREATE TABLE IF NOT EXISTS `alunos` (
   `id_aluno` int NOT NULL AUTO_INCREMENT,
-  `id_escola` int NOT NULL,
-  `numero_ficha` varchar(50) NOT NULL,
   `nome_completo` varchar(255) NOT NULL,
-  `apelido` varchar(255) DEFAULT NULL,
-  `data_nascimento` date DEFAULT NULL,
-  `estado_civil` varchar(50) DEFAULT NULL,
-  `nome_pai` varchar(255) DEFAULT NULL,
-  `nome_mae` varchar(255) DEFAULT NULL,
-  `local_nascimento` varchar(255) DEFAULT NULL,
-  `tipo_identificacao` varchar(50) DEFAULT NULL,
-  `numero_identificacao` varchar(100) NOT NULL,
-  `pais_origem` varchar(100) DEFAULT NULL,
-  `profissao` varchar(100) DEFAULT NULL,
+  `data_nascimento` date NOT NULL,
+  `numero_identificacao` varchar(50) NOT NULL,
+  `tipo_identificacao` varchar(50) NOT NULL,
   `endereco` varchar(255) DEFAULT NULL,
-  `numero_casa` varchar(50) DEFAULT NULL,
-  `telefone_principal` varchar(50) NOT NULL,
-  `telefone_alternativo` varchar(50) DEFAULT NULL,
+  `telefone` varchar(50) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `genero` varchar(10) DEFAULT NULL,
-  `foto_url` varchar(255) DEFAULT NULL,
-  `data_registo` datetime DEFAULT CURRENT_TIMESTAMP,
+  `id_escola` int NOT NULL,
+  `data_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `data_atualizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_aluno`),
-  UNIQUE KEY `numero_ficha` (`numero_ficha`),
   UNIQUE KEY `numero_identificacao` (`numero_identificacao`),
   KEY `id_escola` (`id_escola`),
   CONSTRAINT `alunos_ibfk_1` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `aulas` (
-  `id_aula` int NOT NULL AUTO_INCREMENT,
-  `id_matricula` int NOT NULL,
-  `id_instrutor` int NOT NULL,
-  `tipo_aula` varchar(50) NOT NULL,
-  `data_aula` date NOT NULL,
-  `hora_inicio` time NOT NULL,
-  `hora_fim` time NOT NULL,
-  `duracao_minutos` int DEFAULT NULL,
-  `rubrica_aluno` tinyint(1) DEFAULT '0',
-  `rubrica_instrutor` tinyint(1) DEFAULT '0',
-  `observacoes` text,
-  `data_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_aula`),
-  KEY `id_matricula` (`id_matricula`),
-  KEY `id_instrutor` (`id_instrutor`),
-  CONSTRAINT `aulas_ibfk_1` FOREIGN KEY (`id_matricula`) REFERENCES `matriculas` (`id_matricula`),
-  CONSTRAINT `aulas_ibfk_2` FOREIGN KEY (`id_instrutor`) REFERENCES `utilizadores` (`id_utilizador`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `categoriascarta` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
@@ -111,20 +79,6 @@ CREATE TABLE IF NOT EXISTS `exames` (
   PRIMARY KEY (`id_exame`),
   UNIQUE KEY `id_matricula` (`id_matricula`,`tipo_exame`,`numero_tentativa`),
   CONSTRAINT `exames_ibfk_1` FOREIGN KEY (`id_matricula`) REFERENCES `matriculas` (`id_matricula`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `instrutores` (
-  `id_instrutor` int NOT NULL AUTO_INCREMENT,
-  `id_utilizador` int NOT NULL,
-  `cnh` varchar(50) DEFAULT NULL,
-  `categoria_cnh` varchar(10) DEFAULT NULL,
-  `data_nascimento` date DEFAULT NULL,
-  `id_escola` int DEFAULT NULL,
-  PRIMARY KEY (`id_instrutor`),
-  UNIQUE KEY `id_utilizador` (`id_utilizador`),
-  KEY `fk_instrutor_escola` (`id_escola`),
-  CONSTRAINT `fk_instrutor_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
-  CONSTRAINT `fk_instrutor_utilizador` FOREIGN KEY (`id_utilizador`) REFERENCES `utilizadores` (`id_utilizador`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `matriculas` (
@@ -219,23 +173,6 @@ CREATE TABLE IF NOT EXISTS `utilizadores` (
   KEY `id_tipo_utilizador` (`id_tipo_utilizador`),
   CONSTRAINT `utilizadores_ibfk_1` FOREIGN KEY (`id_tipo_utilizador`) REFERENCES `tiposutilizador` (`id_tipo_utilizador`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `veiculos` (
-  `id_veiculo` int NOT NULL AUTO_INCREMENT,
-  `placa` varchar(20) NOT NULL,
-  `modelo` varchar(100) NOT NULL,
-  `marca` varchar(100) NOT NULL,
-  `ano` int NOT NULL,
-  `categoria` varchar(50) NOT NULL,
-  `id_escola` int NOT NULL,
-  `id_instrutor` int DEFAULT NULL,
-  PRIMARY KEY (`id_veiculo`),
-  UNIQUE KEY `placa` (`placa`),
-  KEY `id_escola` (`id_escola`),
-  KEY `id_instrutor` (`id_instrutor`),
-  CONSTRAINT `fk_veiculo_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
-  CONSTRAINT `fk_veiculo_instrutor` FOREIGN KEY (`id_instrutor`) REFERENCES `utilizadores` (`id_utilizador`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -14,7 +14,6 @@ async function seedDatabase() {
             { id: 2, nome_tipo: "Admin Escola", descricao: "Administrador de uma ou mais escolas específicas." },
             { id: 3, nome_tipo: "Gestor Geral", descricao: "Gestor com visão agregada de todas as escolas." },
             { id: 4, nome_tipo: "Gestor Escola Específica", descricao: "Gestor operacional de uma escola específica." },
-            { id: 5, nome_tipo: "Instrutor", descricao: "Instrutor de condução." },
             { id: 6, nome_tipo: "Aluno", descricao: "Aluno matriculado na escola." }
         ];
 

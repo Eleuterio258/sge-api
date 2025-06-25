@@ -103,15 +103,6 @@ class Escola {
             ORDER BY p.data_pagamento DESC
             LIMIT 10
         `);
-        // Aulas agendadas recentemente
-        const [aulas] = await pool.execute(`
-            SELECT CONCAT(a.data_aula, ' ', a.hora_inicio) as data_evento, 'aula' as tipo, CONCAT('Aula agendada: ', al.nome_completo) as mensagem, m.id_escola
-            FROM aulas a
-            JOIN matriculas m ON a.id_matricula = m.id_matricula
-            JOIN alunos al ON m.id_aluno = al.id_aluno
-            ORDER BY a.data_aula DESC, a.hora_inicio DESC
-            LIMIT 10
-        `);
         // Exames aprovados recentemente
         const [exames] = await pool.execute(`
             SELECT e.data_exame as data_evento, 'exame' as tipo, CONCAT('Exame aprovado: ', a.nome_completo) as mensagem, m.id_escola
@@ -123,7 +114,7 @@ class Escola {
             LIMIT 10
         `);
         // Unir e ordenar todos os eventos por data_evento desc
-        const todas = [...matriculas, ...pagamentos, ...aulas, ...exames];
+        const todas = [...matriculas, ...pagamentos, ...exames];
         todas.sort((a, b) => new Date(b.data_evento).getTime() - new Date(a.data_evento).getTime());
         return todas.slice(0, 10);
     }

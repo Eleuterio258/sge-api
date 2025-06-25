@@ -18,10 +18,10 @@ interface CategoriaCartaConducaoAPI {
   preco: string;
 }
 
-const StudentManagementsDetails: React.FC = () => {
+const StudentsPageDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { accessToken, isTokenValid } = useAuth();
+  const { accessToken, isTokenValid, user } = useAuth();
   const [aluno, setAluno] = useState<Aluno | null>(null);
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
   const [escolas, setEscolas] = useState<Escola[]>([]);
@@ -31,8 +31,42 @@ const StudentManagementsDetails: React.FC = () => {
   const [showMatriculaForm, setShowMatriculaForm] = useState<boolean>(false);
   const [submittingMatricula, setSubmittingMatricula] = useState<boolean>(false);
 
+  // Obter escolas atribuídas ao usuário
+  const getUserEscolas = (): Escola[] => {
+    if (!user) return [];
+    
+    // Se for Super Admin, pode ver todas as escolas
+    if (user.id_tipo_utilizador === 1) {
+      return escolas;
+    }
+    
+    // Para outros roles, filtrar apenas escolas atribuídas
+    const userEscolas = user.escolas_atribuidas || [];
+    return escolas.filter(escola => 
+      userEscolas.some(userEscola => 
+        userEscola.id_escola === escola.id_escola && userEscola.ativo === 1
+      )
+    );
+  };
+
+  // Obter escola padrão para o usuário
+  const getDefaultEscola = (): number => {
+    if (!user) return 0;
+    
+    // Se for Super Admin, não pré-selecionar
+    if (user.id_tipo_utilizador === 1) {
+      return 0;
+    }
+    
+    // Para outros roles, usar a primeira escola atribuída
+    const userEscolas = user.escolas_atribuidas || [];
+    const activeSchool = userEscolas.find(school => school.ativo === 1);
+    
+    return activeSchool ? activeSchool.id_escola : 0;
+  };
+
   const [novaMatricula, setNovaMatricula] = useState<NovaMatriculaData>({
-    id_escola: 0,
+    id_escola: getDefaultEscola(),
     id_categoria_carta: 0,
     data_inicio_curso: '',
     horario_inicio_curso: '08:00',
@@ -173,6 +207,17 @@ const StudentManagementsDetails: React.FC = () => {
     fetchData();
   }, [id, accessToken, isTokenValid, fetchMatriculas]);
 
+  // Atualizar escola padrão quando usuário ou escolas mudarem
+  useEffect(() => {
+    const defaultEscola = getDefaultEscola();
+    if (defaultEscola > 0 && novaMatricula.id_escola === 0) {
+      setNovaMatricula(prev => ({
+        ...prev,
+        id_escola: defaultEscola
+      }));
+    }
+  }, [user, escolas]);
+
   // Função para calcular o total com taxa de serviço
   const calcularTotalComTaxa = (custoCurso: string | number): number => {
     const custo = typeof custoCurso === 'string' ? parseFloat(custoCurso) : custoCurso;
@@ -226,6 +271,8 @@ const StudentManagementsDetails: React.FC = () => {
     if (!novaMatricula.custo_total_curso || parseFloat(novaMatricula.custo_total_curso) <= 0) {
       return "Custo total do curso inválido";
     }
+    
+    // Só validar valor da primeira parcela se for pagamento parcelado (mais de 1 parcela)
     if (novaMatricula.numero_parcelas > 1) {
       if (!novaMatricula.valor_primeira_parcela || novaMatricula.valor_primeira_parcela <= 0) {
         return "Informe o valor da primeira parcela";
@@ -285,7 +332,7 @@ const StudentManagementsDetails: React.FC = () => {
 
       // Resetar formulário
       setNovaMatricula({
-        id_escola: 0,
+        id_escola: getDefaultEscola(),
         id_categoria_carta: 0,
         data_inicio_curso: '',
         horario_inicio_curso: '08:00',
@@ -818,18 +865,18 @@ const StudentManagementsDetails: React.FC = () => {
 
     // Filho de... e de
     page.drawText('Filho de', { x: leftMargin, y: currentY, size: 10, font, color: black });
-    let filhoX = leftMargin + font.widthOfTextAtSize('Filho de', 10) + 3;
+    const filhoX = leftMargin + font.widthOfTextAtSize('Filho de', 10) + 3;
     drawDottedLine(filhoX, currentY - 2, 150);
     if (aluno.nome_pai) {
       page.drawText(aluno.nome_pai, { x: filhoX + 2, y: currentY, size: 10, font, color: black });
     }
 
-    let eDeX = filhoX + 155;
+    const eDeX = filhoX + 155;
     page.drawText('e de', { x: eDeX, y: currentY, size: 10, font, color: black });
-    eDeX += font.widthOfTextAtSize('e de', 10) + 3;
-    drawDottedLine(eDeX, currentY - 2, rightLimit - eDeX);
+    const eDeX2 = eDeX + font.widthOfTextAtSize('e de', 10) + 3;
+    drawDottedLine(eDeX2, currentY - 2, rightLimit - eDeX2);
     if (aluno.nome_mae) {
-      page.drawText(aluno.nome_mae, { x: eDeX + 2, y: currentY, size: 10, font, color: black });
+      page.drawText(aluno.nome_mae, { x: eDeX2 + 2, y: currentY, size: 10, font, color: black });
     }
     currentY -= lineSpacing;
 
@@ -839,57 +886,57 @@ const StudentManagementsDetails: React.FC = () => {
 
     // Distrito e Província
     page.drawText('Distrito', { x: leftMargin, y: currentY, size: 10, font, color: black });
-    let distritoX = leftMargin + font.widthOfTextAtSize('Distrito', 10) + 3;
+    const distritoX = leftMargin + font.widthOfTextAtSize('Distrito', 10) + 3;
     drawDottedLine(distritoX, currentY - 2, 100);
 
-    let provinciaX = distritoX + 105;
+    const provinciaX = distritoX + 105;
     page.drawText('Província de', { x: provinciaX, y: currentY, size: 10, font, color: black });
-    provinciaX += font.widthOfTextAtSize('Província de', 10) + 3;
-    drawDottedLine(provinciaX, currentY - 2, rightLimit - provinciaX);
+    const provinciaX2 = provinciaX + font.widthOfTextAtSize('Província de', 10) + 3;
+    drawDottedLine(provinciaX2, currentY - 2, rightLimit - provinciaX2);
     currentY -= lineSpacing;
 
     // Residente em e Av.
     page.drawText('Residente em', { x: leftMargin, y: currentY, size: 10, font, color: black });
-    let residenteX = leftMargin + font.widthOfTextAtSize('Residente em', 10) + 3;
+    const residenteX = leftMargin + font.widthOfTextAtSize('Residente em', 10) + 3;
     drawDottedLine(residenteX, currentY - 2, 140);
     if (aluno.endereco) {
       page.drawText(aluno.endereco, { x: residenteX + 2, y: currentY, size: 10, font, color: black });
     }
 
-    let avX = residenteX + 145;
+    const avX = residenteX + 145;
     page.drawText('Av.', { x: avX, y: currentY, size: 10, font, color: black });
-    avX += font.widthOfTextAtSize('Av.', 10) + 3;
-    drawDottedLine(avX, currentY - 2, rightLimit - avX);
+    const avX2 = avX + font.widthOfTextAtSize('Av.', 10) + 3;
+    drawDottedLine(avX2, currentY - 2, rightLimit - avX2);
     currentY -= lineSpacing;
 
     // Nº e Telefones
     page.drawText('Nº', { x: leftMargin, y: currentY, size: 10, font, color: black });
-    let numeroX = leftMargin + font.widthOfTextAtSize('Nº', 10) + 3;
+    const numeroX = leftMargin + font.widthOfTextAtSize('Nº', 10) + 3;
     drawDottedLine(numeroX, currentY - 2, 50);
     if (aluno.numero_casa) {
       page.drawText(String(aluno.numero_casa), { x: numeroX + 2, y: currentY, size: 10, font, color: black });
     }
 
-    let telX = numeroX + 55;
+    const telX = numeroX + 55;
     page.drawText('Tel:', { x: telX, y: currentY, size: 10, font, color: black });
-    telX += font.widthOfTextAtSize('Tel:', 10) + 3;
-    drawDottedLine(telX, currentY - 2, 65);
+    const telX2 = telX + font.widthOfTextAtSize('Tel:', 10) + 3;
+    drawDottedLine(telX2, currentY - 2, 65);
     if (aluno.telefone_principal) {
-      page.drawText(aluno.telefone_principal, { x: telX + 2, y: currentY, size: 10, font, color: black });
+      page.drawText(aluno.telefone_principal, { x: telX2 + 2, y: currentY, size: 10, font, color: black });
     }
 
-    telX += 70;
-    page.drawText('/', { x: telX, y: currentY, size: 10, font, color: black });
-    telX += 10;
-    drawDottedLine(telX, currentY - 2, 65);
+    const telX3 = telX2 + 70;
+    page.drawText('/', { x: telX3, y: currentY, size: 10, font, color: black });
+    const telX4 = telX3 + 10;
+    drawDottedLine(telX4, currentY - 2, 65);
     if (aluno.telefone_alternativo) {
-      page.drawText(aluno.telefone_alternativo, { x: telX + 2, y: currentY, size: 10, font, color: black });
+      page.drawText(aluno.telefone_alternativo, { x: telX4 + 2, y: currentY, size: 10, font, color: black });
     }
 
-    telX += 70;
-    page.drawText('Tel nº', { x: telX, y: currentY, size: 10, font, color: black });
-    telX += font.widthOfTextAtSize('Tel nº', 10) + 3;
-    drawDottedLine(telX, currentY - 2, rightLimit - telX);
+    const telX5 = telX4 + 70;
+    page.drawText('Tel nº', { x: telX5, y: currentY, size: 10, font, color: black });
+    const telX6 = telX5 + font.widthOfTextAtSize('Tel nº', 10) + 3;
+    drawDottedLine(telX6, currentY - 2, rightLimit - telX6);
     currentY -= lineSpacing;
 
     // Profissão
@@ -898,21 +945,21 @@ const StudentManagementsDetails: React.FC = () => {
 
     // B.I., Arquivo, Emitido
     page.drawText('B.I.nº', { x: leftMargin, y: currentY, size: 10, font, color: black });
-    let biX = leftMargin + font.widthOfTextAtSize('B.I.nº', 10) + 3;
+    const biX = leftMargin + font.widthOfTextAtSize('B.I.nº', 10) + 3;
     drawDottedLine(biX, currentY - 2, 85);
     if (aluno.numero_identificacao) {
       page.drawText(aluno.numero_identificacao, { x: biX + 2, y: currentY, size: 10, font, color: black });
     }
 
-    let arquivoX = biX + 90;
+    const arquivoX = biX + 90;
     page.drawText('Arquivo de', { x: arquivoX, y: currentY, size: 10, font, color: black });
-    arquivoX += font.widthOfTextAtSize('Arquivo de', 10) + 3;
-    drawDottedLine(arquivoX, currentY - 2, 65);
+    const arquivoX2 = arquivoX + font.widthOfTextAtSize('Arquivo de', 10) + 3;
+    drawDottedLine(arquivoX2, currentY - 2, 65);
 
-    let emitidoX = arquivoX + 70;
+    const emitidoX = arquivoX2 + 70;
     page.drawText('Emitido em', { x: emitidoX, y: currentY, size: 10, font, color: black });
-    emitidoX += font.widthOfTextAtSize('Emitido em', 10) + 3;
-    drawDottedLine(emitidoX, currentY - 2, rightLimit - emitidoX);
+    const emitidoX2 = emitidoX + font.widthOfTextAtSize('Emitido em', 10) + 3;
+    drawDottedLine(emitidoX2, currentY - 2, rightLimit - emitidoX2);
     currentY -= lineSpacing;
 
     // --- SEÇÃO INÍCIO DO CURSO ---
@@ -941,38 +988,38 @@ const StudentManagementsDetails: React.FC = () => {
     });
 
     // Lado esquerdo da seção curso
-    let cursoLeftY = cursoY - 40;
+    const cursoLeftY = cursoY - 40;
 
     // Data
     drawField('Data', '', leftMargin + 10, cursoLeftY, 120);
-    cursoLeftY -= 15;
+    const cursoLeftY2 = cursoLeftY - 15;
 
     // Horário
-    page.drawText('Horário:', { x: leftMargin + 10, y: cursoLeftY, size: 10, font, color: black });
-    cursoLeftY -= 15;
+    page.drawText('Horário:', { x: leftMargin + 10, y: cursoLeftY2, size: 10, font, color: black });
+    const cursoLeftY3 = cursoLeftY2 - 15;
 
     // Código de Estrada
-    page.drawText('Código de Estrada', { x: leftMargin + 10, y: cursoLeftY, size: 10, font, color: black });
-    let codigoX = leftMargin + 10 + font.widthOfTextAtSize('Código de Estrada', 10) + 3;
-    drawDottedLine(codigoX, cursoLeftY - 2, 50);
-    codigoX += 55;
-    page.drawText('às', { x: codigoX, y: cursoLeftY, size: 10, font, color: black });
-    codigoX += 20;
-    drawDottedLine(codigoX, cursoLeftY - 2, 40);
-    codigoX += 45;
-    page.drawText('Horas', { x: codigoX, y: cursoLeftY, size: 10, font, color: black });
-    cursoLeftY -= 15;
+    page.drawText('Código de Estrada', { x: leftMargin + 10, y: cursoLeftY3, size: 10, font, color: black });
+    const codigoX = leftMargin + 10 + font.widthOfTextAtSize('Código de Estrada', 10) + 3;
+    drawDottedLine(codigoX, cursoLeftY3 - 2, 50);
+    const codigoX2 = codigoX + 55;
+    page.drawText('às', { x: codigoX2, y: cursoLeftY3, size: 10, font, color: black });
+    const codigoX3 = codigoX2 + 20;
+    drawDottedLine(codigoX3, cursoLeftY3 - 2, 40);
+    const codigoX4 = codigoX3 + 45;
+    page.drawText('Horas', { x: codigoX4, y: cursoLeftY3, size: 10, font, color: black });
+    const cursoLeftY4 = cursoLeftY3 - 15;
 
     // Condução
-    page.drawText('Condução', { x: leftMargin + 10, y: cursoLeftY, size: 10, font, color: black });
-    let conducaoX = leftMargin + 10 + font.widthOfTextAtSize('Condução', 10) + 3;
-    drawDottedLine(conducaoX, cursoLeftY - 2, 65);
-    conducaoX += 70;
-    page.drawText('às', { x: conducaoX, y: cursoLeftY, size: 10, font, color: black });
-    conducaoX += 20;
-    drawDottedLine(conducaoX, cursoLeftY - 2, 50);
-    conducaoX += 55;
-    page.drawText('Horas', { x: conducaoX, y: cursoLeftY, size: 10, font, color: black });
+    page.drawText('Condução', { x: leftMargin + 10, y: cursoLeftY4, size: 10, font, color: black });
+    const conducaoX = leftMargin + 10 + font.widthOfTextAtSize('Condução', 10) + 3;
+    drawDottedLine(conducaoX, cursoLeftY4 - 2, 65);
+    const conducaoX2 = conducaoX + 70;
+    page.drawText('às', { x: conducaoX2, y: cursoLeftY4, size: 10, font, color: black });
+    const conducaoX3 = conducaoX2 + 20;
+    drawDottedLine(conducaoX3, cursoLeftY4 - 2, 50);
+    const conducaoX4 = conducaoX3 + 55;
+    page.drawText('Horas', { x: conducaoX4, y: cursoLeftY4, size: 10, font, color: black });
 
     // --- TABELA CLASSE (lado direito) ---
     const tabelaX = leftMargin + 220;
@@ -1151,7 +1198,7 @@ const StudentManagementsDetails: React.FC = () => {
       color: black,
     });
 
-    let introX = contratoMargin + font.widthOfTextAtSize('Eu', 11) + 5;
+    const introX = contratoMargin + font.widthOfTextAtSize('Eu', 11) + 5;
     drawDottedLine(introX, contratoY - 2, 200);
     if (aluno.nome_completo) {
       page.drawText(aluno.nome_completo, {
@@ -1173,7 +1220,7 @@ const StudentManagementsDetails: React.FC = () => {
       color: black,
     });
 
-    let alunoX = contratoMargin + font.widthOfTextAtSize('Identifico no verso faço o contrato para o aluno de', 11) + 5;
+    const alunoX = contratoMargin + font.widthOfTextAtSize('Identifico no verso faço o contrato para o aluno de', 11) + 5;
     drawDottedLine(alunoX, contratoY - 2, 150);
     if (aluno.nome_completo) {
       page.drawText(aluno.nome_completo, {
@@ -1277,7 +1324,7 @@ const StudentManagementsDetails: React.FC = () => {
 
     // --- Salvar e baixar PDF ---
     const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
@@ -1443,12 +1490,22 @@ const StudentManagementsDetails: React.FC = () => {
                     required
                   >
                     <option value={0}>Selecione uma escola</option>
-                    {escolas.map(escola => (
+                    {getUserEscolas().map(escola => (
                       <option key={escola.id_escola} value={escola.id_escola}>
                         {escola.nome_escola}
                       </option>
                     ))}
                   </select>
+                  {user && user.id_tipo_utilizador !== 1 && novaMatricula.id_escola > 0 && (
+                    <p className="text-xs text-blue-600 mt-1">
+                      ✓ Escola pré-selecionada com base nas suas atribuições
+                    </p>
+                  )}
+                  {user && user.id_tipo_utilizador === 1 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Super Admin: Pode selecionar qualquer escola
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1858,4 +1915,4 @@ const StudentManagementsDetails: React.FC = () => {
   );
 };
 
-export default StudentManagementsDetails;
+export default StudentsPageDetails;

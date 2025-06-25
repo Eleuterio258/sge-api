@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f7e8;
+    padding: 30px;
+    border: 2px solid #333;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.field-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+label {
+    font-size: 14px;
+    color: #333;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+input[type="text"] {
+    border: none;
+    border-bottom: 1px dotted #333;
+    background: transparent;
+    padding: 2px 5px;
+    font-size: 14px;
+    color: #333;
+    min-width: 80px;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-bottom: 1px solid #333;
+}
+
+span {
+    font-size: 14px;
+    color: #333;
+    margin: 0 5px;
+}
+
+/* Campos específicos com tamanhos diferentes */
+#ficha_no {
+    max-width: 150px;
+}
+
+#apelido, #nome {
+    min-width: 300px;
+}
+
+#data_inscricao, #data_nascimento, #emitido_em, #data_curso {
+    max-width: 120px;
+}
+
+#data_nascimento_mes, #data_nascimento_ano {
+    max-width: 80px;
+}
+
+#estado_civil {
+    max-width: 100px;
+}
+
+#numero, #tel, #tel2 {
+    max-width: 100px;
+}
+
+#codigo_estrada_horas, #conducao_horas {
+    max-width: 60px;
+}
+
+/* Seção início do curso */
+.inicio-curso {
+    border: 2px solid #333;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #f5f3e0;
+}
+
+.inicio-curso h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Seção classe e categorias */
+.classe-categorias {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.classe {
+    flex: 2;
+    border: 2px solid #333;
+    padding: 10px;
+    background-color: #f5f3e0;
+}
+
+.classe h3 {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.classe h4 {
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.classe table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.classe table td {
+    border: 1px solid #333;
+    padding: 3px 5px;
+    text-align: center;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.classe table img {
+    width: 20px;
+    height: 15px;
+    background-color: #ddd;
+    border: 1px solid #999;
+}
+
+.categorias-prof {
+    flex: 1;
+    border: 2px solid #333;
+    padding: 10px;
+    background-color: #f5f3e0;
+}
+
+.categorias-prof h3 {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.categorias-prof ul {
+    list-style: none;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.categorias-prof li {
+    margin-bottom: 2px;
+    padding-left: 5px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .field-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    input[type="text"] {
+        width: 100%;
+        margin-top: 5px;
+    }
+    
+    .classe-categorias {
+        flex-direction: column;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+}
+
+/* Ajustes para campos específicos */
+.field-group:has(#data_nascimento) {
+    flex-wrap: wrap;
+}
+
+.field-group:has(#data_nascimento) input,
+.field-group:has(#data_nascimento) span {
+    margin: 2px;
+}
+
+/* Placeholder styling */
+input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+

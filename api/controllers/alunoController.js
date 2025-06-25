@@ -6,13 +6,106 @@ const xlsx = require("xlsx");
 const minioClient = require("../config/minio");
 const XLSX = require("xlsx");
 
+// Validation function for student data
+const validateAlunoData = (data) => {
+    const errors = [];
+    
+    // Required fields
+    if (!data.id_escola) errors.push("id_escola é obrigatório");
+    if (!data.numero_ficha) errors.push("numero_ficha é obrigatório");
+    if (!data.nome_completo) errors.push("nome_completo é obrigatório");
+    if (!data.numero_identificacao) errors.push("numero_identificacao é obrigatório");
+    if (!data.telefone_principal) errors.push("telefone_principal é obrigatório");
+    
+    // Validate email format if provided
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        errors.push("email deve ter um formato válido");
+    }
+    
+    // Validate phone format
+    if (data.telefone_principal && !/^\+?[0-9\s\-\(\)]+$/.test(data.telefone_principal)) {
+        errors.push("telefone_principal deve ter um formato válido");
+    }
+    
+    if (data.telefone_alternativo && !/^\+?[0-9\s\-\(\)]+$/.test(data.telefone_alternativo)) {
+        errors.push("telefone_alternativo deve ter um formato válido");
+    }
+    
+    // Validate date format
+    if (data.data_nascimento && !/^\d{4}-\d{2}-\d{2}$/.test(data.data_nascimento)) {
+        errors.push("data_nascimento deve estar no formato YYYY-MM-DD");
+    }
+    
+    return errors;
+};
+
 exports.createAluno = async (req, res) => {
     try {
+        // Validate input data
+        const validationErrors = validateAlunoData(req.body);
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ 
+                message: "Dados inválidos", 
+                errors: validationErrors 
+            });
+        }
+
+        // Check if numero_ficha already exists
+        const existingFicha = await Aluno.getByNumeroFicha(req.body.numero_ficha);
+        if (existingFicha) {
+            return res.status(409).json({ 
+                message: "Número de ficha já existe no sistema" 
+            });
+        }
+
+        // Check if numero_identificacao already exists
+        const existingIdentificacao = await Aluno.getByNumeroIdentificacao(req.body.numero_identificacao);
+        if (existingIdentificacao) {
+            return res.status(409).json({ 
+                message: "Número de identificação já existe no sistema" 
+            });
+        }
+
+        // Check if email already exists (if provided)
+        if (req.body.email) {
+            const existingEmail = await Aluno.getByEmail(req.body.email);
+            if (existingEmail) {
+                return res.status(409).json({ 
+                    message: "Email já existe no sistema" 
+                });
+            }
+        }
+
         const alunoId = await Aluno.create(req.body);
-        res.status(201).json({ message: "Aluno criado com sucesso", alunoId });
+        res.status(201).json({ 
+            message: "Aluno criado com sucesso", 
+            alunoId,
+            aluno: await Aluno.getById(alunoId)
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erro ao criar aluno" });
+        console.error("Erro ao criar aluno:", error);
+        
+        // Handle specific database errors
+        if (error.code === 'ER_DUP_ENTRY') {
+            if (error.message.includes('numero_ficha')) {
+                return res.status(409).json({ message: "Número de ficha já existe no sistema" });
+            }
+            if (error.message.includes('numero_identificacao')) {
+                return res.status(409).json({ message: "Número de identificação já existe no sistema" });
+            }
+            if (error.message.includes('email')) {
+                return res.status(409).json({ message: "Email já existe no sistema" });
+            }
+        }
+        
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            return res.status(400).json({ message: "Escola não encontrada" });
+        }
+        
+        res.status(500).json({ 
+            message: "Erro interno do servidor ao criar aluno",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
@@ -28,12 +121,71 @@ exports.getAllAlunos = async (req, res) => {
 
 exports.getAlunosPorEscola = async (req, res) => {
     try {
+
+        console.log(req.params)
         const { id_escola } = req.params;
         const alunos = await Aluno.getByEscolaId(id_escola);
         res.status(200).json(alunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar alunos por escola" });
+    }
+};
+
+// Listar alunos das escolas atribuídas ao usuário
+exports.getAlunosEscolasAtribuidas = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        const userEscolas = req.user.escolas;
+
+        // Se for Super Admin (role 1), pode ver alunos de todas as escolas
+        if (userRole === 1) {
+            const alunos = await Aluno.getAllWithFinanceiro();
+            return res.status(200).json({
+                success: true,
+                message: "Alunos de todas as escolas (Super Admin)",
+                total_alunos: alunos.length,
+                alunos: alunos
+            });
+        }
+
+        // Para outros roles, verificar se tem escolas atribuídas
+        if (!userEscolas || userEscolas.length === 0) {
+            return res.status(403).json({
+                success: false,
+                message: "Você não tem escolas atribuídas para visualizar alunos"
+            });
+        }
+
+        // Buscar alunos das escolas atribuídas
+        const alunosEscolasAtribuidas = [];
+        let totalAlunos = 0;
+
+        for (const escolaId of userEscolas) {
+            const alunosEscola = await Aluno.getByEscolaId(escolaId);
+            alunosEscolasAtribuidas.push({
+                id_escola: escolaId,
+                alunos: alunosEscola,
+                total_alunos_escola: alunosEscola.length
+            });
+            totalAlunos += alunosEscola.length;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Alunos das escolas atribuídas recuperados com sucesso",
+            total_escolas: userEscolas.length,
+            total_alunos: totalAlunos,
+            escolas_alunos: alunosEscolasAtribuidas
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar alunos das escolas atribuídas:', error);
+        res.status(500).json({
+            success: false,
+            message: "Erro interno do servidor ao buscar alunos das escolas atribuídas"
+        });
     }
 };
 

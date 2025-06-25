@@ -81,6 +81,21 @@ class Aluno {
         }
         return alunosComDividas;
     }
+
+    static async getByNumeroFicha(numero_ficha) {
+        const [rows] = await pool.execute("SELECT * FROM alunos WHERE numero_ficha = ?", [numero_ficha]);
+        return rows[0];
+    }
+
+    static async getByNumeroIdentificacao(numero_identificacao) {
+        const [rows] = await pool.execute("SELECT * FROM alunos WHERE numero_identificacao = ?", [numero_identificacao]);
+        return rows[0];
+    }
+
+    static async getByEmail(email) {
+        const [rows] = await pool.execute("SELECT * FROM alunos WHERE email = ?", [email]);
+        return rows[0];
+    }
 }
 
 module.exports = Aluno;

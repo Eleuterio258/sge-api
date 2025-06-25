@@ -1,5 +1,5 @@
 // types/auth.ts
-export type UserRole = 1 | 2 | 3 | 4 | 5 | 6;
+export type UserRole = 1 | 2 | 3 | 5 | 6;
 
 export interface User {
   id_utilizador: number;
@@ -55,7 +55,6 @@ export const USER_TYPE_MAPPING: Record<UserRole, string> = {
   1: 'superadmin',
   2: 'local_admin',
   3: 'financial',
-  4: 'instructor',
   5: 'secretary',
   6: 'student'
 };
@@ -65,7 +64,6 @@ export const ROLE_ROUTES: Record<UserRole, string> = {
   1: '/admin/dashboard',
   2: '/local-admin/dashboard',
   3: '/financial/dashboard',
-  4: '/instructor/dashboard',
   5: '/secretary/dashboard',
   6: '/student/dashboard'
 };
@@ -75,7 +73,6 @@ export const ROLE_NAMES: Record<UserRole, string> = {
   1: 'Super Administrador',
   2: 'Administrador Local',
   3: 'Gestor Financeiro',
-  4: 'Instrutor',
   5: 'Secretário',
   6: 'Estudante'
 };
@@ -86,9 +83,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'schools', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'students', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'instructors', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'vehicles', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'lessons', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'payments', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'reports', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'enrollments', actions: ['create', 'read', 'update', 'delete'] },
@@ -101,9 +95,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   2: [ // Admin Local
     { resource: 'schools', actions: ['read', 'update'] },
     { resource: 'students', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'instructors', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'vehicles', actions: ['create', 'read', 'update', 'delete'] },
-    { resource: 'lessons', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'payments', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'reports', actions: ['read'] },
     { resource: 'local-admin', actions: ['create', 'read', 'update', 'delete'] },
@@ -115,20 +106,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { resource: 'reports', actions: ['read'] },
     { resource: 'financial', actions: ['create', 'read', 'update', 'delete'] },
   ],
-  4: [ // Instrutor
-    { resource: 'schools', actions: ['read'] },
-    { resource: 'students', actions: ['read'] },
-    { resource: 'lessons', actions: ['read', 'update'] },
-    { resource: 'instructor', actions: ['read', 'update'] },
-  ],
   5: [ // Secretário
     { resource: 'students', actions: ['create', 'read', 'update'] },
-    { resource: 'lessons', actions: ['create', 'read'] },
     { resource: 'payments', actions: ['read'] },
     { resource: 'secretary', actions: ['create', 'read', 'update'] },
   ],
   6: [ // Estudante
-    { resource: 'lessons', actions: ['read'] },
     { resource: 'student', actions: ['read'] },
   ],
 };

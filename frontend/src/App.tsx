@@ -8,18 +8,13 @@ import { Dashboard } from "./components/Dashboard";
 
 // Admin (Local Admin)
 import StudentsPage from "./pages/admin/StudentsPage";
-import VehiclesPage from "./pages/admin/VehiclesPage";
-import LessonsPage from "./pages/admin/LessonsPage";
+import StudentsPageDetails from "./pages/admin/StudentsPageDetails";
 import { EscolasPage } from "./pages/admin/EscolasPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Financeiro
 import FinancialDashboard from "./pages/finaceiro/FinancialDashboard";
 import FinancialReports from "./pages/finaceiro/FinancialReports";
-
-// Instrutor
-import InstructorDashboard from "./pages/instrutor/InstructorDashboard";
-import InstructorPage from "./pages/instrutor/InstructorPage";
 
 // Superadmin
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
@@ -30,8 +25,6 @@ import StudentManagementsDetails from "./pages/superadmin/StudentManagementsDeta
 import SystemReports from "./pages/superadmin/SystemReports";
 import UserSchoolAssignment from "./pages/superadmin/UserSchoolAssignment";
 import PaymentsManagement from "./pages/superadmin/PaymentsManagement";
-import VehiclesManagement from "./pages/superadmin/VehiclesManagement";
-import LessonsManagement from "./pages/superadmin/LessonsManagement";
 
 import { UserRole, ROLE_PERMISSIONS } from "./types/auth";
 
@@ -111,7 +104,6 @@ function RoleBasedRedirect() {
     1: '/admin/dashboard',      // Super Admin
     2: '/local-admin/dashboard', // Local Admin
     3: '/financial/dashboard',  // Financial Manager
-    4: '/instructor/dashboard', // Instructor
     5: '/secretary/dashboard',  // Secretary
     6: '/student/dashboard'     // Student
   };
@@ -152,30 +144,8 @@ const App = () => (
             } 
           />
           
-       
-          
-      
           {/* Gestão de escolas - apenas Super Admin e Local Admin */}
           <Route path="escolas" element={<PermissionRoute requiredPermission={{ resource: 'schools', action: 'read' }}><EscolasPage /></PermissionRoute>} />
-          
-          {/* Rotas adicionais para itens do sidebar */}
-          <Route 
-            path="lessons" 
-            element={
-              <PermissionRoute allowedRoles={[1, 2, 4]}>
-                <LessonsManagement />
-              </PermissionRoute>
-            } 
-          />
-          
-          <Route 
-            path="vehicles" 
-            element={
-              <PermissionRoute allowedRoles={[1, 2]}>
-                <VehiclesManagement />
-              </PermissionRoute>
-            } 
-          />
         </Route>
 
         {/* Dashboards específicos por role */}
@@ -206,30 +176,6 @@ const App = () => (
               requiredPermission={{ resource: 'students', action: 'read' }}
             >
               <StudentManagements />
-            </PermissionRoute>
-          } />
-          <Route path="vehicles" element={
-            <PermissionRoute 
-              allowedRoles={[1]} 
-              requiredPermission={{ resource: 'vehicles', action: 'read' }}
-            >
-              <VehiclesManagement />
-            </PermissionRoute>
-          } />
-          <Route path="lessons" element={
-            <PermissionRoute 
-              allowedRoles={[1]} 
-              requiredPermission={{ resource: 'lessons', action: 'read' }}
-            >
-              <LessonsManagement />
-            </PermissionRoute>
-          } />
-          <Route path="instructors" element={
-            <PermissionRoute 
-              allowedRoles={[1]} 
-              requiredPermission={{ resource: 'instructors', action: 'read' }}
-            >
-              <InstructorPage />
             </PermissionRoute>
           } />
           <Route path="users" element={
@@ -269,7 +215,7 @@ const App = () => (
               allowedRoles={[1]} 
               requiredPermission={{ resource: 'reports', action: 'read' }}
             >
-              <SystemReports />
+              <FinancialReports />
             </PermissionRoute>
           } />
         </Route>
@@ -286,19 +232,6 @@ const App = () => (
           <Route path="dashboard" element={<FinancialDashboard />} />
           <Route path="payments" element={<PaymentsManagement />} />
           <Route path="reports" element={<FinancialReports />} />
-        </Route>
-
-        {/* Instructor Dashboard */}
-        <Route 
-          path="/instructor/*" 
-          element={
-            <PermissionRoute allowedRoles={[4]}>
-              <Layout />
-            </PermissionRoute>
-          }
-        >
-          <Route path="dashboard" element={<InstructorDashboard />} />
-          {/* TODO: Implement LessonsManagement and InstructorStudents components */}
         </Route>
 
         {/* Secretary Dashboard */}
@@ -325,7 +258,6 @@ const App = () => (
           }
         >
           <Route path="dashboard" element={<div>Student Dashboard</div>} />
-          <Route path="lessons" element={<div>Student Lessons</div>} />
           <Route path="progress" element={<div>Student Progress</div>} />
         </Route>
 
@@ -340,9 +272,7 @@ const App = () => (
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="students" element={<StudentsPage />} />
-          <Route path="vehicles" element={<VehiclesPage />} />
-          <Route path="lessons" element={<LessonsPage />} />
-          <Route path="instructors" element={<InstructorPage />} />
+          <Route path="students/:id" element={<StudentsPageDetails />} />
           {/* Outras rotas do admin local podem ser adicionadas aqui */}
         </Route>
 

@@ -391,15 +391,7 @@ const UsersManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Debug Panel - Remover em produção */}
-      <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="font-medium text-yellow-800 mb-2">Debug Info (Remover em produção)</h3>
-        <div className="text-xs text-yellow-700 space-y-1">
-          <p>Token: {accessToken?.substring(0, 100)}...</p>
-          <p>URL da API: {apiClient.defaults.baseURL}</p>
-          <p>Headers: {JSON.stringify(apiClient.defaults.headers)}</p>
-        </div>
-      </div>
+  
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">

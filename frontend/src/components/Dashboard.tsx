@@ -26,30 +26,22 @@ export const Dashboard = () => {
   const getStatsForCurrentUser = () => {
     if (user?.id_tipo_utilizador === 1) { // Super Admin
       return {
-        students: '247',
-        instructors: '18',
-        vehicles: '12',
-        revenue: 'MT 45.230'
+        students: '156',
+        revenue: 'MT 45,230'
       };
     } else if (currentUserSchool === 'escola-1') {
       return {
         students: '89',
-        instructors: '7',
-        vehicles: '5',
-        revenue: 'MT 18.450'
+        revenue: 'MT 28,450'
       };
     } else if (currentUserSchool === 'escola-2') {
       return {
-        students: '63',
-        instructors: '5',
-        vehicles: '4',
-        revenue: 'MT 12.880'
+        students: '67',
+        revenue: 'MT 16,780'
       };
     }
     return {
       students: '0',
-      instructors: '0',
-      vehicles: '0',
       revenue: 'MT 0'
     };
   };
@@ -65,20 +57,6 @@ export const Dashboard = () => {
       color: 'text-blue-600'
     },
     {
-      title: 'Instrutores Ativos',
-      value: statsData.instructors,
-      icon: GraduationCap,
-      trend: '+2',
-      color: 'text-green-600'
-    },
-    {
-      title: 'Veículos Disponíveis',
-      value: statsData.vehicles,
-      icon: Car,
-      trend: '100%',
-      color: 'text-purple-600'
-    },
-    {
       title: 'Receita Mensal',
       value: statsData.revenue,
       icon: TrendingUp,
@@ -91,7 +69,6 @@ export const Dashboard = () => {
     const baseActivities = [
       { id: 1, type: 'enrollment', message: 'Nova matrícula: Maria Silva', time: '2h atrás', schoolId: 'escola-1' },
       { id: 2, type: 'payment', message: 'Pagamento recebido: João Santos', time: '4h atrás', schoolId: 'escola-1' },
-      { id: 3, type: 'lesson', message: 'Aula agendada: Ana Costa', time: '6h atrás', schoolId: 'escola-2' },
       { id: 4, type: 'exam', message: 'Exame aprovado: Pedro Oliveira', time: '1d atrás', schoolId: 'escola-1' },
       { id: 5, type: 'enrollment', message: 'Nova matrícula: Carlos Norte', time: '2d atrás', schoolId: 'escola-2' },
     ];
@@ -105,29 +82,11 @@ export const Dashboard = () => {
 
   const recentActivities = getRecentActivitiesForCurrentUser();
 
-  const getUpcomingLessonsForCurrentUser = () => {
-    const baseLessons = [
-      { student: 'Maria Silva', instructor: 'João Instrutor', time: '14:00', type: 'Prática', schoolId: 'escola-1' },
-      { student: 'Pedro Santos', instructor: 'Ana Instrutora', time: '15:30', type: 'Teórica', schoolId: 'escola-1' },
-      { student: 'Carla Lima', instructor: 'João Instrutor', time: '16:00', type: 'Prática', schoolId: 'escola-2' },
-      { student: 'Carlos Norte', instructor: 'Maria Instrutora', time: '17:00', type: 'Prática', schoolId: 'escola-2' },
-    ];
-
-    if (user?.id_tipo_utilizador === 1) { // Super Admin
-      return baseLessons;
-    }
-
-    return baseLessons.filter(lesson => lesson.schoolId === currentUserSchool);
-  };
-
-  const upcomingLessons = getUpcomingLessonsForCurrentUser();
-
   const getUserRoleLabel = () => {
     switch (user?.id_tipo_utilizador) {
       case 1: return 'Super Administrador';
       case 2: return 'Administrador Local';
       case 3: return 'Gestor Financeiro';
-      case 4: return 'Instrutor';
       case 5: return 'Secretário';
       case 6: return 'Estudante';
       default: return 'Utilizador';
@@ -216,7 +175,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow">
             <div className="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
@@ -236,42 +195,6 @@ export const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Próximas Aulas */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Próximas Aulas
-            </h3>
-          </div>
-          <div className="p-6 pt-0">
-            <div className="space-y-4">
-              {upcomingLessons.length > 0 ? upcomingLessons.map((lesson, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">{lesson.student}</p>
-                    <p className="text-sm text-muted-foreground">Instrutor: {lesson.instructor}</p>
-                    {user?.id_tipo_utilizador === 1 && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                        <Building className="w-3 h-3" />
-                        {getSchoolName(lesson.schoolId)}
-                      </p>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">{lesson.time}</p>
-                    <p className="text-sm text-muted-foreground">{lesson.type}</p>
-                  </div>
-                </div>
-              )) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Nenhuma aula agendada para hoje
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Atividades Recentes */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
           <div className="flex flex-col space-y-1.5 p-6">

@@ -20,20 +20,14 @@ const menuItems = [
   // Itens para Super Admin
   { icon: Home, label: 'Dashboard', id: 'dashboard', to: '/admin/dashboard', roles: [1] },
   { icon: Users, label: 'Estudantes', id: 'students', to: '/admin/student-managements', roles: [1] },
-  { icon: Car, label: 'Veículos', id: 'vehicles', to: '/admin/vehicles', roles: [1] },
-  { icon: Calendar, label: 'Aulas', id: 'lessons', to: '/admin/lessons', roles: [1] },
-  { icon: GraduationCap, label: 'Instrutores', id: 'instructors', to: '/admin/instructors', roles: [1] },
   { icon: Building, label: 'Gestão de Escolas', id: 'schools-management', to: '/admin/schools', roles: [1] },
   { icon: Users, label: 'Gestão de Usuários', id: 'users-management', to: '/admin/users', roles: [1] },
   { icon: LinkIcon, label: 'Atribuição Usuários-Escolas', id: 'user-school-assignment', to: '/admin/user-school-assignment', roles: [1] },
-  { icon: BarChart3, label: 'Relatórios', id: 'system-reports', to: '/admin/reports', roles: [1] },
+  { icon: BarChart3, label: 'Relatórios Financeiro', id: 'system-reports', to: '/admin/reports', roles: [1] },
 
   // Itens para Admin Local
   { icon: Home, label: 'Dashboard', id: 'dashboard', to: '/local-admin/dashboard', roles: [2] },
   { icon: Users, label: 'Estudantes', id: 'students', to: '/local-admin/students', roles: [2] },
-  { icon: Car, label: 'Veículos', id: 'vehicles', to: '/local-admin/vehicles', roles: [2] },
-  { icon: Calendar, label: 'Aulas', id: 'lessons', to: '/local-admin/lessons', roles: [2] },
-  { icon: GraduationCap, label: 'Instrutores', id: 'instructors', to: '/local-admin/instructors', roles: [2] },
 ];
 
 interface AppSidebarProps {

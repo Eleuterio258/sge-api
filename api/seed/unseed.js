@@ -14,7 +14,6 @@ async function unseedDatabase() {
         const tables = [
             "Pagamentos",
             "Parcelas",
-            "aulas",
             "exames",
             "matriculas",
             "Escola_Utilizadores",

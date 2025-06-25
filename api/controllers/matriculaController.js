@@ -5,20 +5,21 @@ const Pagamento = require("../models/Pagamento");
 
 exports.createMatricula = async (req, res) => {
     try {
-        const { 
-            id_aluno, 
-            id_escola, 
-            id_categoria_carta, 
-            numero_parcelas, 
+        const {
+            id_aluno,
+            id_escola,
+            id_categoria_carta,
+            numero_parcelas,
             valor_primeira_parcela,
             duracao_contrato_meses,
-            data_inicio_curso 
+            data_inicio_curso,
+            custo_total_curso
         } = req.body;
 
         // Validar campos obrigatórios
         if (!id_aluno || !id_escola || !id_categoria_carta || !valor_primeira_parcela) {
-            return res.status(400).json({ 
-                message: "Campos obrigatórios: id_aluno, id_escola, id_categoria_carta, valor_primeira_parcela" 
+            return res.status(400).json({
+                message: "Campos obrigatórios: id_aluno, id_escola, id_categoria_carta, valor_primeira_parcela"
             });
         }
 
@@ -39,14 +40,18 @@ exports.createMatricula = async (req, res) => {
             return res.status(400).json({ message: "Valor da primeira parcela deve ser maior que zero" });
         }
 
-        if (valorPrimeiraParcela > categoria.preco) {
-            return res.status(400).json({ 
-                message: `Valor da primeira parcela (${valorPrimeiraParcela}) não pode ser maior que o custo total do curso (${categoria.preco})` 
+        // Usar o custo_total_curso enviado pelo frontend (que inclui taxa de serviço)
+        // Se não for fornecido, usar o preço da categoria + taxa de serviço padrão
+        const custoTotal = Number(custo_total_curso) || (Number(categoria.preco) + 600);
+        
+        if (valorPrimeiraParcela > custoTotal) {
+            return res.status(400).json({
+                message: `Valor da primeira parcela (${valorPrimeiraParcela}) não pode ser maior que o custo total do curso (${custoTotal})`
             });
         }
 
         // Calcular valor das parcelas restantes
-        const valorRestante = categoria.preco - valorPrimeiraParcela;
+        const valorRestante = custoTotal - valorPrimeiraParcela;
         const parcelasRestantes = nParcelas - 1;
         const valorDemaisParcelas = parcelasRestantes > 0 ? valorRestante / parcelasRestantes : 0;
 
@@ -64,7 +69,7 @@ exports.createMatricula = async (req, res) => {
             id_escola: Number(id_escola),
             id_categoria_carta: Number(id_categoria_carta),
             data_inicio_curso: dataInicioCurso,
-            custo_total_curso: categoria.preco,
+            custo_total_curso: custoTotal,
             status_matricula: req.body.status_matricula || 'Ativa',
             horario_inicio_curso: req.body.horario_inicio_curso || '08:00:00',
             duracao_contrato_meses: duracaoMeses,
@@ -77,7 +82,14 @@ exports.createMatricula = async (req, res) => {
         const datasVencimento = [];
         for (let i = 0; i < nParcelas; i++) {
             const dataVencimento = new Date();
-            dataVencimento.setMonth(dataVencimento.getMonth() + i + 1);
+            // CORREÇÃO: Para parcela única, vencimento imediato ou conforme regra de negócio
+            if (nParcelas === 1) {
+                // Se é parcela única, pode vencer hoje ou em alguns dias
+                dataVencimento.setDate(dataVencimento.getDate() + 7); // 7 dias a partir de hoje, ajuste conforme necessário
+            } else {
+                // Para múltiplas parcelas, vence no próximo mês + i
+                dataVencimento.setMonth(dataVencimento.getMonth() + i + 1);
+            }
             datasVencimento.push(dataVencimento.toISOString().slice(0, 10));
         }
 
@@ -85,7 +97,7 @@ exports.createMatricula = async (req, res) => {
         const parcelasCreated = [];
         for (let i = 0; i < nParcelas; i++) {
             let valorParcela;
-            
+
             if (i === 0) {
                 valorParcela = valorPrimeiraParcela;
             } else {
@@ -108,11 +120,11 @@ exports.createMatricula = async (req, res) => {
             });
         }
 
-        res.status(201).json({ 
-            message: "Matrícula criada com sucesso", 
+        res.status(201).json({
+            message: "Matrícula criada com sucesso",
             matriculaId,
             numero_parcelas: nParcelas,
-            custo_total: categoria.preco,
+            custo_total: custoTotal,
             valor_primeira_parcela: valorPrimeiraParcela,
             valor_demais_parcelas: parcelasRestantes > 0 ? parseFloat(valorDemaisParcelas.toFixed(2)) : 0,
             valor_restante: valorRestante,
@@ -120,9 +132,9 @@ exports.createMatricula = async (req, res) => {
         });
     } catch (error) {
         console.error('Erro ao criar matrícula:', error);
-        res.status(500).json({ 
-            message: "Erro ao criar matrícula", 
-            error: error.message 
+        res.status(500).json({
+            message: "Erro ao criar matrícula",
+            error: error.message
         });
     }
 };
@@ -131,26 +143,26 @@ exports.createMatricula = async (req, res) => {
 const calcularInformacoesFinanceiras = async (matriculaId) => {
     // Buscar parcelas da matrícula
     const parcelas = await Parcela.getByMatriculaId(matriculaId);
-    
+
     // Buscar pagamentos da matrícula
     const pagamentos = await Pagamento.getByMatriculaId(matriculaId);
-    
+
     // Calcular totais
     const valorTotal = parcelas.reduce((total, parcela) => total + Number(parcela.valor_devido), 0);
     const valorPago = pagamentos.reduce((total, pagamento) => total + Number(pagamento.valor_pago), 0);
     const valorPendente = valorTotal - valorPago;
-    
+
     // Contar status das parcelas
     const parcelasPagas = parcelas.filter(p => p.status_parcela === 'Paga').length;
     const parcelasPendentes = parcelas.filter(p => p.status_parcela === 'Pendente').length;
     const parcelasParciais = parcelas.filter(p => p.status_parcela === 'Parcialmente Paga').length;
-    
+
     // Verificar parcelas vencidas
     const hoje = new Date().toISOString().slice(0, 10);
-    const parcelasVencidas = parcelas.filter(p => 
+    const parcelasVencidas = parcelas.filter(p =>
         p.status_parcela !== 'Paga' && p.data_vencimento < hoje
     );
-    
+
     return {
         resumo_financeiro: {
             valor_total: parseFloat(valorTotal.toFixed(2)),
@@ -186,7 +198,7 @@ const calcularInformacoesFinanceiras = async (matriculaId) => {
 exports.getAllMatriculas = async (req, res) => {
     try {
         const matriculas = await Matricula.getAll();
-        
+
         // Adicionar informações financeiras para cada matrícula
         const matriculasComFinanceiro = await Promise.all(
             matriculas.map(async (matricula) => {
@@ -197,7 +209,7 @@ exports.getAllMatriculas = async (req, res) => {
                 };
             })
         );
-        
+
         res.status(200).json(matriculasComFinanceiro);
     } catch (error) {
         console.error(error);
@@ -211,15 +223,15 @@ exports.getMatriculaById = async (req, res) => {
         if (!matricula) {
             return res.status(404).json({ message: "Matrícula não encontrada" });
         }
-        
+
         // Adicionar informações financeiras
         const infoFinanceira = await calcularInformacoesFinanceiras(matricula.id_matricula);
-        
+
         const matriculaCompleta = {
             ...matricula,
             ...infoFinanceira
         };
-        
+
         res.status(200).json(matriculaCompleta);
     } catch (error) {
         console.error(error);
@@ -244,13 +256,13 @@ exports.updateMatricula = async (req, res) => {
 exports.getMatriculasByAlunoId = async (req, res) => {
     try {
         const { id_aluno } = req.params;
-        
+
         const matriculas = await Matricula.getByAlunoId(id_aluno);
-        
+
         if (matriculas.length === 0) {
             return res.status(404).json({ message: "Nenhuma matrícula encontrada para este aluno" });
         }
-        
+
         // Adicionar informações financeiras para cada matrícula
         const matriculasComFinanceiro = await Promise.all(
             matriculas.map(async (matricula) => {
@@ -261,13 +273,13 @@ exports.getMatriculasByAlunoId = async (req, res) => {
                 };
             })
         );
-        
+
         res.status(200).json(matriculasComFinanceiro);
     } catch (error) {
         console.error('Erro ao buscar matrículas por aluno:', error);
-        res.status(500).json({ 
-            message: "Erro ao buscar matrículas do aluno", 
-            error: error.message 
+        res.status(500).json({
+            message: "Erro ao buscar matrículas do aluno",
+            error: error.message
         });
     }
 };

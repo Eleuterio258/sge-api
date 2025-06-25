@@ -24,7 +24,7 @@
 							"raw": "{\n    \"nome_completo\": \"Super Admin Teste\",\n    \"email\": \"superadmin_test@example.com\",\n    \"senha\": \"senha123\",\n    \"telefone\": \"+258841234567\",\n    \"id_tipo_utilizador\": 1\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/auth/register",
+							"raw": "http://localhost:3000/api/auth/register",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -55,7 +55,7 @@
 							"raw": "{\n    \"email\": \"superadmin_test@example.com\",\n    \"senha\": \"senha123\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/auth/login",
+							"raw": "http://localhost:3000/api/auth/login",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -95,7 +95,7 @@
 							"raw": "{\n    \"nome_escola\": \"Escola de Condução Teste\",\n    \"endereco\": \"Rua Exemplo, 123\",\n    \"distrito\": \"Maputo\",\n    \"provincia\": \"Maputo Cidade\",\n    \"telefone\": \"+258849876543\",\n    \"email\": \"teste@escola.com\",\n    \"nuit\": \"123456789\",\n    \"logo_url\": \"http://example.com/logo.png\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/escolas",
+							"raw": "http://localhost:3000/api/escolas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -121,7 +121,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/escolas",
+							"raw": "http://localhost:3000/api/escolas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -160,7 +160,7 @@
 							"raw": "{\n    \"id_escola\": 1,\n    \"numero_ficha\": \"FICHA001\",\n    \"nome_completo\": \"Aluno Teste\",\n    \"apelido\": \"Sobrenome\",\n    \"data_nascimento\": \"2000-01-01\",\n    \"estado_civil\": \"Solteiro(a)\",\n    \"nome_pai\": \"Pai Teste\",\n    \"nome_mae\": \"Mae Teste\",\n    \"local_nascimento\": \"Maputo\",\n    \"tipo_identificacao\": \"BI\",\n    \"numero_identificacao\": \"123456789X\",\n    \"pais_origem\": \"Moçambique\",\n    \"profissao\": \"Estudante\",\n    \"endereco\": \"Av. Principal, 456\",\n    \"numero_casa\": \"10\",\n    \"telefone_principal\": \"+258841122334\",\n    \"telefone_alternativo\": \"+258821122334\",\n    \"email\": \"aluno.teste@example.com\",\n    \"genero\": \"Masculino\",\n    \"foto_url\": \"http://example.com/aluno.jpg\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/alunos",
+							"raw": "http://localhost:3000/api/alunos",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -186,7 +186,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/alunos",
+							"raw": "http://localhost:3000/api/alunos",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -225,7 +225,7 @@
 							"raw": "{\n    \"codigo_categoria\": \"B\",\n    \"descricao\": \"Veículos ligeiros\",\n    \"tipo\": \"Condução\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/categorias-carta",
+							"raw": "http://localhost:3000/api/categorias-carta",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -251,7 +251,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/categorias-carta",
+							"raw": "http://localhost:3000/api/categorias-carta",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -290,7 +290,7 @@
 							"raw": "{\n    \"id_aluno\": 1,\n    \"id_escola\": 1,\n    \"id_categoria_carta\": 1,\n    \"data_inicio_curso\": \"2025-07-01\",\n    \"horario_inicio_curso\": \"09:00:00\",\n    \"duracao_contrato_meses\": 6,\n    \"custo_total_curso\": 1500.00,\n    \"status_matricula\": \"Ativa\",\n    \"data_fim_instrucao\": \"2026-01-01\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/matriculas",
+							"raw": "http://localhost:3000/api/matriculas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -316,7 +316,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/matriculas",
+							"raw": "http://localhost:3000/api/matriculas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -355,7 +355,7 @@
 							"raw": "{\n    \"id_matricula\": 1,\n    \"id_instrutor\": 1,\n    \"tipo_aula\": \"Prática\",\n    \"data_aula\": \"2025-07-05\",\n    \"hora_inicio\": \"10:00:00\",\n    \"hora_fim\": \"11:00:00\",\n    \"duracao_minutos\": 60,\n    \"rubrica_aluno\": false,\n    \"rubrica_instrutor\": false,\n    \"observacoes\": \"Aula de condução na cidade\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/aulas",
+							"raw": "http://localhost:3000/api/aulas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -381,7 +381,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/aulas",
+							"raw": "http://localhost:3000/api/aulas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -420,7 +420,7 @@
 							"raw": "{\n    \"id_matricula\": 1,\n    \"numero_tentativa\": 1,\n    \"tipo_exame\": \"Teórico\",\n    \"data_exame\": \"2025-08-01\",\n    \"resultado\": \"Pendente\",\n    \"observacoes\": \"Primeira tentativa de exame teórico\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/exames",
+							"raw": "http://localhost:3000/api/exames",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -446,7 +446,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/exames",
+							"raw": "http://localhost:3000/api/exames",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -485,7 +485,7 @@
 							"raw": "{\n    \"id_matricula\": 1,\n    \"numero_parcela\": 1,\n    \"valor_devido\": 500.00,\n    \"data_vencimento\": \"2025-07-15\",\n    \"status_parcela\": \"Pendente\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/parcelas",
+							"raw": "http://localhost:3000/api/parcelas",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -511,7 +511,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/parcelas/matricula/1",
+							"raw": "http://localhost:3000/api/parcelas/matricula/1",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -552,7 +552,7 @@
 							"raw": "{\n    \"id_matricula\": 1,\n    \"id_parcela\": 1, \n    \"valor_pago\": 500.00,\n    \"metodo_pagamento\": \"Dinheiro\",\n    \"observacoes\": \"Pagamento da primeira parcela\"\n}"
 						},
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/pagamentos",
+							"raw": "http://localhost:3000/api/pagamentos",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"
@@ -578,7 +578,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://135.181.249.37:3000/api/pagamentos/matricula/1",
+							"raw": "http://localhost:3000/api/pagamentos/matricula/1",
 							"protocol": "http",
 							"host": [
 								"135.181.249.37"

@@ -27,8 +27,8 @@ const SystemReports: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Relatórios do Sistema</h1>
-      <p className="text-muted-foreground">Em breve: relatórios do sistema.</p>
+      <h1 className="text-2xl font-bold mb-4">Relatórios Financeiro</h1>
+      <p className="text-muted-foreground">Em breve: relatórios financeiros detalhados.</p>
     </div>
   );
 };
