@@ -51,7 +51,7 @@ const StudentManagements = () => {
   const [previewFoto, setPreviewFoto] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
   const [novoAluno, setNovoAluno] = useState<NovoAluno>({
-    id_escola: 1,
+    id_escola: 3,
     numero_ficha: "",
     nome_completo: "",
     apelido: "",
