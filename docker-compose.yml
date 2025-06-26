@@ -1,5 +1,51 @@
 version: '3.8'
 services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: sge_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Maputo2023@#
+      MYSQL_DATABASE: sge_conducao
+      MYSQL_USER: sge_user
+      MYSQL_PASSWORD: sge_password_2024
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./api/sge_conducao_db.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - sge_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "sge_user", "-psge_password_2024"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MinIO for file storage
+  minio:
+    image: minio/minio:latest
+    container_name: sge_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - sge_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   backend:
     build:
       context: ./api
@@ -12,17 +58,39 @@ services:
       - JWT_SECRET=sge_conducao_jwt_secret_key_2024_very_secure_and_long_key_for_production
       - JWT_EXPIRES_IN=360d
       - JWT_REFRESH_EXPIRES_IN=7d
-      - DB_HOST=135.181.249.37
-      - DB_USER=root
-      - DB_PASSWORD=Maputo2023@#
+      # MySQL Local Configuration
+      - DB_HOST=mysql
+      - DB_USER=sge_user
+      - DB_PASSWORD=sge_password_2024
       - DB_NAME=sge_conducao
       - DB_PORT=3306
+      - DB_SSL=false
+      # MinIO Configuration
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_BUCKET=sge-files
+      - MINIO_REGION=us-east-1
+      - MINIO_USE_SSL=false
+      # Application Configuration
       - CORS_ORIGIN=*
       - MAX_FILE_SIZE=5242880
       - UPLOAD_PATH=./uploads
+      - API_URL=http://localhost:4000
     restart: always
-    # depends_on:
-    #   - db # Descomente se usar banco em container
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - sge_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   frontend:
     build:
@@ -32,4 +100,18 @@ services:
       - "3000:80"
     depends_on:
       - backend
-    restart: always 
+    restart: always
+    networks:
+      - sge_network
+
+# Volumes for persistent data
+volumes:
+  mysql_data:
+    driver: local
+  minio_data:
+    driver: local
+
+# Network for service communication
+networks:
+  sge_network:
+    driver: bridge 
