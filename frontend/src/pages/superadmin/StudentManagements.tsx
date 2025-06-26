@@ -227,7 +227,7 @@ const StudentManagements = () => {
 
   const resetNovoAlunoForm = useCallback(() => {
     setNovoAluno({
-      id_escola: 1,
+      id_escola: 3,
       numero_ficha: "",
       nome_completo: "",
       apelido: "",
