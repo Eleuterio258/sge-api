@@ -118,11 +118,7 @@ export function LoginForm() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center text-xs text-muted-foreground">
-          <p>Desenvolvido para gestão completa de escolas de condução</p>
-          <p className="mt-1">© 2024 EscolaCondução - Todos os direitos reservados</p>
-        </div>
+       
       </div>
     </div>
   );
