@@ -5,10 +5,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Aluno, Matricula, Escola, CategoriaCartaConducao, NovaMatriculaData, Parcela, DetalhesPagamento } from "../../types/studentManagements";
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
-const API_URL = "http://135.181.249.37:4000/api/alunos";
-const MATRICULAS_API_URL = "http://135.181.249.37:4000/api/matriculas";
-const ESCOLAS_API_URL = "http://135.181.249.37:4000/api/escolas";
-const CATEGORIAS_API_URL = "http://135.181.249.37:4000/api/categorias-carta";
+const API_URL = "http://18.206.244.149:4000/api/alunos";
+const MATRICULAS_API_URL = "http://18.206.244.149:4000/api/matriculas";
+const ESCOLAS_API_URL = "http://18.206.244.149:4000/api/escolas";
+const CATEGORIAS_API_URL = "http://18.206.244.149:4000/api/categorias-carta";
 
 // Interface para a API de categorias
 interface CategoriaCartaConducaoAPI {
@@ -393,7 +393,7 @@ const StudentsPageDetails: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://135.181.249.37:4000/api/pagamentos', dadosPagamento, {
+      const response = await axios.post('http://18.206.244.149:4000/api/pagamentos', dadosPagamento, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'

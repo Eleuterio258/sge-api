@@ -21,7 +21,7 @@ export function EscolasPage() {
     setIsSubmitting(true);
     setFormError(null);
     try {
-      await axios.post('http://135.181.249.37:4000/api/escolas', data, {
+      await axios.post('http://18.206.244.149:4000/api/escolas', data, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setShowForm(false);

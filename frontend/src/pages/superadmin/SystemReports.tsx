@@ -46,10 +46,10 @@ const SystemReports: React.FC = () => {
     try {
       setLoading(true);
       const [alunosResponse, estatisticasResponse] = await Promise.all([
-        axios.get('http://135.181.249.37:4000/api/alunos/dividas', {
+        axios.get('http://18.206.244.149:4000/api/alunos/dividas', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }),
-        axios.get('http://135.181.249.37:4000/api/dashboard/payment-stats', {
+        axios.get('http://18.206.244.149:4000/api/dashboard/payment-stats', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
       ]);

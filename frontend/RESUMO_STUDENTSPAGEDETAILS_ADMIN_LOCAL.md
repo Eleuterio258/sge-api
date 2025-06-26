@@ -41,10 +41,10 @@ Foi criada uma rota para visualizar detalhes de alunos específicos no painel do
 - **Corrigida API URL**:
   ```typescript
   // Antes
-  const API_URL = "http://135.181.249.37:4000/api/alunos/escolas-atribuidas";
+  const API_URL = "http://18.206.244.149:4000/api/alunos/escolas-atribuidas";
   
   // Depois
-  const API_URL = "http://135.181.249.37:4000/api/alunos";
+  const API_URL = "http://18.206.244.149:4000/api/alunos";
   ```
 - **Corrigida importação de tipos**:
   ```typescript

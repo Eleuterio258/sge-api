@@ -40,7 +40,7 @@ interface NovoAluno {
   foto_url?: string;
 }
 
-const API_URL = "http://135.181.249.37:4000/api/alunos";
+const API_URL = "http://18.206.244.149:4000/api/alunos";
 
 const StudentsPage = () => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -186,7 +186,7 @@ const StudentsPage = () => {
     formData.append("file", file);
 
     try {
-      const res = await axios.post("http://135.181.249.37:4000/api/uploads", formData, {
+      const res = await axios.post("http://18.206.244.149:4000/api/uploads", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
