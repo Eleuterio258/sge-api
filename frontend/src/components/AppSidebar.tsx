@@ -188,7 +188,7 @@ export function AppSidebar({
         {!isCollapsed && (
           <div className="space-y-1">
             <div className="text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-              © 2024 EscolaCondução
+              © 2025  
             </div>
             {user && (
               <div className="text-xs text-sidebar-foreground/40">
