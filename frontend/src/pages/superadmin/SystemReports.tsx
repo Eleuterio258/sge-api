@@ -2,74 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { AlertCircle, DollarSign, TrendingUp, Users, Calendar, Filter, Download, Eye } from "lucide-react";
 import axios from "axios";
-
-interface Aluno {
-  id_aluno: number;
-  nome_completo: string;
-  numero_ficha: string;
-  telefone_principal: string;
-  email?: string;
-  id_escola: number;
-  nome_escola?: string;
-  matriculas: Matricula[];
-}
-
-interface Matricula {
-  id_matricula: number;
-  id_aluno: number;
-  id_escola: number;
-  id_categoria_carta: number;
-  custo_total_curso: string;
-  numero_parcelas: number;
-  data_matricula: string;
-  status_matricula: string;
-  parcelas: Parcela[];
-  pagamentos: Pagamento[];
-  resumo_financeiro?: ResumoFinanceiro;
-}
-
-interface Parcela {
-  id_parcela: number;
-  id_matricula: number;
-  numero_parcela: number;
-  valor_devido: string;
-  data_vencimento: string;
-  status_parcela: string;
-}
-
-interface Pagamento {
-  id_pagamento: number;
-  id_matricula: number;
-  id_parcela: number;
-  valor_pago: string;
-  metodo_pagamento: string;
-  data_pagamento: string;
-  observacoes?: string;
-}
-
-interface ResumoFinanceiro {
-  valor_total: number;
-  valor_pago: number;
-  valor_pendente: number;
-  percentual_pago: number;
-}
-
-interface EstatisticasFinanceiras {
-  total_alunos: number;
-  alunos_com_dividas: number;
-  valor_total_devido: number;
-  valor_total_recebido: number;
-  percentual_recebido: number;
-  parcelas_vencidas: number;
-  parcelas_pendentes: number;
-}
+import { Aluno, EstatisticasFinanceiras, FiltrosFinanceiros } from "../../types/financial";
+import FinancialDashboard from "../../components/FinancialDashboard";
 
 const SystemReports: React.FC = () => {
   const { user } = useAuth();
   const [alunosComDividas, setAlunosComDividas] = useState<Aluno[]>([]);
   const [estatisticas, setEstatisticas] = useState<EstatisticasFinanceiras | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filtros, setFiltros] = useState({
+  const [filtros, setFiltros] = useState<FiltrosFinanceiros>({
     escola: "",
     status: "",
     diasVencimento: ""
@@ -268,58 +209,8 @@ const SystemReports: React.FC = () => {
         <p className="text-gray-600">Relatórios e controle financeiro dos alunos</p>
       </div>
 
-      {/* Estatísticas Gerais */}
-      {estatisticas && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Alunos com Dívidas</p>
-                <p className="text-2xl font-bold text-gray-900">{estatisticas.alunos_com_dividas}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <DollarSign className="h-6 w-6 text-red-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Devido</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(estatisticas.valor_total_devido)}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Recebido</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(estatisticas.valor_total_recebido)}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Parcelas Vencidas</p>
-                <p className="text-2xl font-bold text-gray-900">{estatisticas.parcelas_vencidas}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Dashboard Financeiro */}
+      {estatisticas && <FinancialDashboard estatisticas={estatisticas} />}
 
       {/* Filtros */}
       <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
