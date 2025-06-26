@@ -40,50 +40,6 @@ interface NovoAluno {
   foto_url?: string;
 }
 
-// Utilitários de validação para documentos moçambicanos
-const validationUtils = {
-
-
-  validatePassport: (passport: string): { isValid: boolean; message?: string } => {
-    const cleanPassport = passport.replace(/\s+/g, '').toUpperCase();
-
-    if (!cleanPassport) {
-      return { isValid: false, message: "Número do passaporte é obrigatório" };
-    }
-
-    const oldFormatRegex = /^[A-Z][0-9]{6}$/;
-    const newFormatRegex = /^[A-Z]{2}[0-9]{7}$/;
-    const biometricRegex = /^MP[0-9]{6}$/;
-
-    if (oldFormatRegex.test(cleanPassport)) {
-      return { isValid: true };
-    }
-
-    if (newFormatRegex.test(cleanPassport)) {
-      return { isValid: true };
-    }
-
-    if (biometricRegex.test(cleanPassport)) {
-      return { isValid: true };
-    }
-
-    return {
-      isValid: false,
-      message: "Formato inválido. Use: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)"
-    };
-  },
-
-  formatBI: (value: string): string => {
-    const clean = value.replace(/\D/g, '').slice(0, 12);
-    const letter = value.replace(/[^A-Za-z]/g, '').slice(0, 1).toUpperCase();
-    return clean + letter;
-  },
-
-  formatPassport: (value: string): string => {
-    return value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  }
-};
-
 const API_URL = "http://135.181.249.37:4000/api/alunos";
 
 const StudentsPage = () => {
@@ -192,17 +148,7 @@ const StudentsPage = () => {
   const handleNovoAlunoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    let formattedValue = value;
-
-    if (name === 'numero_identificacao') {
-      if (novoAluno.tipo_identificacao === 'BI') {
-        formattedValue = validationUtils.formatBI(value);
-      } else if (novoAluno.tipo_identificacao === 'Passaporte') {
-        formattedValue = validationUtils.formatPassport(value);
-      }
-    }
-
-    setNovoAluno((prev) => ({ ...prev, [name]: formattedValue }));
+    setNovoAluno((prev) => ({ ...prev, [name]: value }));
 
     if (validationErrors[name]) {
       setValidationErrors(prev => {
@@ -212,8 +158,6 @@ const StudentsPage = () => {
       });
     }
   };
-
-
 
   const handleFotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -272,12 +216,8 @@ const StudentsPage = () => {
       errors.email = "Email inválido";
     }
 
-    if (data.tipo_identificacao && data.numero_identificacao) {
-      const identificationError = validateIdentificationNumber(data.tipo_identificacao, data.numero_identificacao);
-      if (identificationError) {
-        errors.numero_identificacao = identificationError;
-      }
-    } else if (data.tipo_identificacao) {
+    // Validação simples para número de identificação (apenas verificar se não está vazio quando tipo está selecionado)
+    if (data.tipo_identificacao && !data.numero_identificacao.trim()) {
       errors.numero_identificacao = "Número de identificação é obrigatório";
     }
 
@@ -678,31 +618,10 @@ const StudentsPage = () => {
                         onChange={handleNovoAlunoChange}
                         className={`p-3 border rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary w-full ${validationErrors.numero_identificacao ? 'border-red-500' : ''
                           }`}
-                        placeholder={
-                          novoAluno.tipo_identificacao === 'BI'
-                            ? "120000000123A"
-                            : novoAluno.tipo_identificacao === 'Passaporte'
-                              ? "A123456 ou AB1234567"
-                              : "Número de Identificação"
-                        }
-                        maxLength={
-                          novoAluno.tipo_identificacao === 'BI' ? 13 :
-                            novoAluno.tipo_identificacao === 'Passaporte' ? 9 :
-                              undefined
-                        }
+                        placeholder="Número de Identificação"
                       />
                       {validationErrors.numero_identificacao && (
                         <p className="text-red-500 text-xs mt-1">{validationErrors.numero_identificacao}</p>
-                      )}
-                      {novoAluno.tipo_identificacao === 'BI' && (
-                        <p className="text-gray-500 text-xs mt-1">
-                          Formato: 12 dígitos + 1 letra (ex: 120000000123A)
-                        </p>
-                      )}
-                      {novoAluno.tipo_identificacao === 'Passaporte' && (
-                        <p className="text-gray-500 text-xs mt-1">
-                          Formato: A123456 (antigo), AB1234567 (novo) ou MP123456 (biométrico)
-                        </p>
                       )}
                     </div>
 
