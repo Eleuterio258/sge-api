@@ -64,7 +64,7 @@ interface EstatisticasFinanceiras {
   parcelas_pendentes: number;
 }
 
-const SystemReports: React.FC = () => {
+const FinancialManagement: React.FC = () => {
   const { user } = useAuth();
   const [alunosComDividas, setAlunosComDividas] = useState<Aluno[]>([]);
   const [estatisticas, setEstatisticas] = useState<EstatisticasFinanceiras | null>(null);
@@ -552,4 +552,4 @@ const SystemReports: React.FC = () => {
   );
 };
 
-export default SystemReports; 
+export default FinancialManagement; 
