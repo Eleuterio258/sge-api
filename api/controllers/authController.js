@@ -86,7 +86,7 @@ exports.login = async (req, res) => {
                 ...userInfo,
                 escolas_atribuidas: escolas
             },
-            expiresIn: process.env.JWT_EXPIRES_IN || "15m"
+            expiresIn: process.env.JWT_EXPIRES_IN || "360d"
         });
     } catch (error) {
         console.error('Erro no login:', error);
