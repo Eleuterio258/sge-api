@@ -92,7 +92,7 @@ export function AppSidebar({
           </div>
           {!isCollapsed && (
             <div className="group-data-[collapsible=icon]:hidden">
-              <h1 className="text-xl font-bold text-sidebar-foreground">EscolaCondução</h1>
+              <h1 className="text-xl font-bold text-sidebar-foreground">ESCOLA DE CONDUÇÃO R. GARCIA</h1>
               <p className="text-sm text-sidebar-foreground/60">Sistema de Gestão</p>
               {user && (
                 <div className="mt-2 space-y-1">

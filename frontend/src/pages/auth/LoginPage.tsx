@@ -68,8 +68,8 @@ export default function LoginPage() {
               <Car className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">DrivingSchool</h1>
-          <p className="text-muted-foreground text-lg">Management System</p>
+          <h1 className="text-3xl font-bold text-foreground">ESCOLA DE CONDUÇÃO R. GARCIA</h1>
+        
         </div>
 
         {/* Login Card */}
