@@ -14,6 +14,7 @@ const exameRoutes = require("./routes/exameRoutes");
 const parcelaRoutes = require("./routes/parcelaRoutes");
 const pagamentoRoutes = require("./routes/pagamentoRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -73,6 +74,7 @@ app.use("/api/exames", exameRoutes);
 app.use("/api/parcelas", parcelaRoutes);
 app.use("/api/pagamentos", pagamentoRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {

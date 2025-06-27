@@ -1,55 +1,102 @@
 const Minio = require('minio');
 
+// Configure MinIO client
 const minioClient = new Minio.Client({
-    endPoint: process.env.MINIO_ENDPOINT || 'minio',
-    port: parseInt(process.env.MINIO_PORT, 10) || 9000,
-    useSSL: process.env.MINIO_USE_SSL === 'true',
-    accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin123',
-    // Configurações adicionais para melhor estabilidade
-    region: process.env.MINIO_REGION || 'us-east-1',
-    transportOptions: {
-        keepAlive: true,
-        keepAliveMsecs: 1000,
-        maxSockets: 10,
-        maxFreeSockets: 10
-    }
+  endPoint: process.env.MINIO_ENDPOINT || '18.206.244.149',
+  port: parseInt(process.env.MINIO_PORT) || 9000,
+  useSSL: false, // Tentar sem SSL primeiro
+  accessKey: process.env.MINIO_ACCESS_KEY || '2Q5RUtRKyfLUbzbg9XFd',
+  secretKey: process.env.MINIO_SECRET_KEY || 'gQY3RZUWALihYn72PZzRl8Bbfjc7AmNYcR5wGtpk'
 });
 
-// Função para testar conexão com MinIO
-const testMinioConnection = async () => {
-    try {
-        // Listar buckets para testar conexão
-        const buckets = await minioClient.listBuckets();
-        console.log('✅ Conexão com MinIO estabelecida com sucesso!');
-        console.log(`🌐 Endpoint: ${process.env.MINIO_ENDPOINT || 'minio'}`);
-        console.log(`🔌 Port: ${process.env.MINIO_PORT || 9000}`);
-        console.log(`👤 Access Key: ${process.env.MINIO_ACCESS_KEY || 'minioadmin'}`);
-        console.log(`📦 Buckets encontrados: ${buckets.length}`);
-        
-        // Verificar se o bucket padrão existe, se não, criar
-        const defaultBucket = process.env.MINIO_BUCKET || 'sge-files';
-        const bucketExists = buckets.some(bucket => bucket.name === defaultBucket);
-        
-        if (!bucketExists) {
-            console.log(`📦 Criando bucket padrão: ${defaultBucket}`);
-            await minioClient.makeBucket(defaultBucket, process.env.MINIO_REGION || 'us-east-1');
-            console.log(`✅ Bucket ${defaultBucket} criado com sucesso!`);
-        } else {
-            console.log(`✅ Bucket ${defaultBucket} já existe`);
-        }
-        
-        return true;
-    } catch (err) {
-        console.error('❌ Erro ao conectar com MinIO:', err.message);
-        console.log('🔧 Verifique se o container MinIO está rodando: docker-compose ps minio');
-        console.log('🔧 Verifique as variáveis de ambiente no docker-compose.yml');
-        console.log('🔧 Verifique se as credenciais estão corretas');
-        return false;
+// Client alternativo com SSL para teste
+const minioClientSSL = new Minio.Client({
+  endPoint: process.env.MINIO_ENDPOINT || '18.206.244.149',
+  port: parseInt(process.env.MINIO_PORT) || 9000,
+  useSSL: true, // Tentar com SSL
+  accessKey: process.env.MINIO_ACCESS_KEY || '2Q5RUtRKyfLUbzbg9XFd',
+  secretKey: process.env.MINIO_SECRET_KEY || 'gQY3RZUWALihYn72PZzRl8Bbfjc7AmNYcR5wGtpk'
+});
+
+const bucketName = process.env.MINIO_BUCKET || 'vaga-livre-files';
+
+// Ensure bucket exists and is public
+const ensureBucket = async () => {
+  try {
+    const exists = await minioClient.bucketExists(bucketName);
+    if (!exists) {
+      await minioClient.makeBucket(bucketName, 'us-east-1');
+      console.log(`✅ Bucket '${bucketName}' created successfully.`);
     }
+    
+    // Configure bucket policy for public read access
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${bucketName}/*`]
+        }
+      ]
+    };
+    
+    try {
+      await minioClient.setBucketPolicy(bucketName, JSON.stringify(policy));
+      console.log(`✅ Bucket '${bucketName}' policy set for public read access.`);
+    } catch (policyError) {
+      console.log(`⚠️ Could not set bucket policy (this is normal if already set): ${policyError.message}`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error ensuring bucket exists:', error);
+    
+    // Tentar com SSL se falhar sem SSL
+    try {
+      console.log('🔄 Trying with SSL...');
+      const existsSSL = await minioClientSSL.bucketExists(bucketName);
+      if (!existsSSL) {
+        await minioClientSSL.makeBucket(bucketName, 'us-east-1');
+        console.log(`✅ Bucket '${bucketName}' created successfully with SSL.`);
+      }
+    } catch (sslError) {
+      console.error('❌ SSL connection also failed:', sslError);
+    }
+  }
 };
 
-// Testar conexão na inicialização
+// Initialize bucket on module load
+ensureBucket();
+
+// Test MinIO connection
+const testMinioConnection = async () => {
+  try {
+    const exists = await minioClient.bucketExists(bucketName);
+    console.log(`✅ MinIO connection test successful. Bucket '${bucketName}' exists: ${exists}`);
+    return true;
+  } catch (error) {
+    console.error('❌ MinIO connection test failed:', error);
+    
+    // Tentar com SSL
+    try {
+      const existsSSL = await minioClientSSL.bucketExists(bucketName);
+      console.log(`✅ MinIO SSL connection test successful. Bucket '${bucketName}' exists: ${existsSSL}`);
+      return true;
+    } catch (sslError) {
+      console.error('❌ MinIO SSL connection test also failed:', sslError);
+      return false;
+    }
+  }
+};
+
+// Test connection on startup
 testMinioConnection();
 
-module.exports = minioClient; 
+module.exports = {
+  minioClient,
+  minioClientSSL,
+  bucketName,
+  ensureBucket,
+  testMinioConnection
+}; 
