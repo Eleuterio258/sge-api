@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   # MySQL Database
   mysql:
@@ -23,6 +24,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
   backend:
     build:
       context: ./api
@@ -42,14 +44,6 @@ services:
       - DB_NAME=sge_conducao
       - DB_PORT=3306
       - DB_SSL=false
-      # MinIO Configuration
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin123
-      - MINIO_BUCKET=sge-files
-      - MINIO_REGION=us-east-1
-      - MINIO_USE_SSL=false
       # Application Configuration
       - CORS_ORIGIN=*
       - MAX_FILE_SIZE=5242880
@@ -58,8 +52,6 @@ services:
     restart: always
     depends_on:
       mysql:
-        condition: service_healthy
-      minio:
         condition: service_healthy
     networks:
       - sge_network
@@ -85,10 +77,8 @@ services:
 volumes:
   mysql_data:
     driver: local
-  minio_data:
-    driver: local
 
 # Network for service communication
 networks:
   sge_network:
-    driver: bridge 
+    driver: bridge
