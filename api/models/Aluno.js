@@ -24,10 +24,38 @@ class Aluno {
     }
 
     static async update(id, alunoData) {
-        const { id_escola, numero_ficha, nome_completo, apelido, data_nascimento, estado_civil, nome_pai, nome_mae, local_nascimento, tipo_identificacao, numero_identificacao, pais_origem, profissao, endereco, numero_casa, telefone_principal, telefone_alternativo, email, genero, foto_url } = alunoData;
+        const { 
+            id_escola, numero_ficha, nome_completo, apelido, data_nascimento, 
+            estado_civil, nome_pai, nome_mae, local_nascimento, tipo_identificacao, 
+            numero_identificacao, pais_origem, profissao, endereco, numero_casa, 
+            telefone_principal, telefone_alternativo, email, genero, foto_url 
+        } = alunoData;
+        
         const [result] = await pool.execute(
             "UPDATE alunos SET id_escola = ?, numero_ficha = ?, nome_completo = ?, apelido = ?, data_nascimento = ?, estado_civil = ?, nome_pai = ?, nome_mae = ?, local_nascimento = ?, tipo_identificacao = ?, numero_identificacao = ?, pais_origem = ?, profissao = ?, endereco = ?, numero_casa = ?, telefone_principal = ?, telefone_alternativo = ?, email = ?, genero = ?, foto_url = ? WHERE id_aluno = ?",
-            [id_escola, numero_ficha, nome_completo, apelido, data_nascimento, estado_civil, nome_pai, nome_mae, local_nascimento, tipo_identificacao, numero_identificacao, pais_origem, profissao, endereco, numero_casa, telefone_principal, telefone_alternativo, email, genero, foto_url, id]
+            [
+                id_escola || null, 
+                numero_ficha || null, 
+                nome_completo || null, 
+                apelido || null, 
+                data_nascimento || null, 
+                estado_civil || null, 
+                nome_pai || null, 
+                nome_mae || null, 
+                local_nascimento || null, 
+                tipo_identificacao || null, 
+                numero_identificacao || null, 
+                pais_origem || null, 
+                profissao || null, 
+                endereco || null, 
+                numero_casa || null, 
+                telefone_principal || null, 
+                telefone_alternativo || null, 
+                email || null, 
+                genero || null, 
+                foto_url || null, 
+                id
+            ]
         );
         return result.affectedRows;
     }

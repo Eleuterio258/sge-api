@@ -6,23 +6,59 @@ const xlsx = require("xlsx");
 const minioClient = require("../config/minio");
 const XLSX = require("xlsx");
 
+// Função para formatar data para o formato ISO (YYYY-MM-DD)
+const formatDateForResponse = (date) => {
+    if (!date) return null;
+    
+    // Se já é uma string no formato correto, retornar
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date;
+    }
+    
+    // Se é um objeto Date do MySQL, converter para string
+    if (date instanceof Date) {
+        return date.toISOString().split('T')[0];
+    }
+    
+    // Tentar criar uma data válida
+    const newDate = new Date(date);
+    if (!isNaN(newDate.getTime())) {
+        return newDate.toISOString().split('T')[0];
+    }
+    
+    return null;
+};
+
+// Função para processar dados do aluno antes de retornar
+const processAlunoData = (aluno) => {
+    if (!aluno) return aluno;
+    
+    // Formatar data de nascimento
+    if (aluno.data_nascimento) {
+        aluno.data_nascimento = formatDateForResponse(aluno.data_nascimento);
+    }
+    
+    return aluno;
+};
+
 // Validation function for student data
-const validateAlunoData = (data) => {
+const validateAlunoData = (data, isUpdate = false) => {
     const errors = [];
     
-    // Required fields
-    if (!data.id_escola) errors.push("id_escola é obrigatório");
-    if (!data.numero_ficha) errors.push("numero_ficha é obrigatório");
-    if (!data.nome_completo) errors.push("nome_completo é obrigatório");
-    if (!data.numero_identificacao) errors.push("numero_identificacao é obrigatório");
-    if (!data.telefone_principal) errors.push("telefone_principal é obrigatório");
+    // Required fields (only for creation, not for updates)
+    if (!isUpdate) {
+        if (!data.id_escola) errors.push("id_escola é obrigatório");
+        if (!data.numero_ficha) errors.push("numero_ficha é obrigatório");
+        if (!data.nome_completo) errors.push("nome_completo é obrigatório");
+        if (!data.telefone_principal) errors.push("telefone_principal é obrigatório");
+    }
     
     // Validate email format if provided
     if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         errors.push("email deve ter um formato válido");
     }
     
-    // Validate phone format
+    // Validate phone format if provided
     if (data.telefone_principal && !/^\+?[0-9\s\-\(\)]+$/.test(data.telefone_principal)) {
         errors.push("telefone_principal deve ter um formato válido");
     }
@@ -31,7 +67,7 @@ const validateAlunoData = (data) => {
         errors.push("telefone_alternativo deve ter um formato válido");
     }
     
-    // Validate date format
+    // Validate date format if provided
     if (data.data_nascimento && !/^\d{4}-\d{2}-\d{2}$/.test(data.data_nascimento)) {
         errors.push("data_nascimento deve estar no formato YYYY-MM-DD");
     }
@@ -112,7 +148,9 @@ exports.createAluno = async (req, res) => {
 exports.getAllAlunos = async (req, res) => {
     try {
         const alunos = await Aluno.getAllWithFinanceiro();
-        res.status(200).json(alunos);
+        // Processar dados de todos os alunos
+        const processedAlunos = alunos.map(processAlunoData);
+        res.status(200).json(processedAlunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar alunos" });
@@ -125,7 +163,9 @@ exports.getAlunosPorEscola = async (req, res) => {
         console.log(req.params)
         const { id_escola } = req.params;
         const alunos = await Aluno.getByEscolaId(id_escola);
-        res.status(200).json(alunos);
+        // Processar dados de todos os alunos
+        const processedAlunos = alunos.map(processAlunoData);
+        res.status(200).json(processedAlunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar alunos por escola" });
@@ -164,12 +204,14 @@ exports.getAlunosEscolasAtribuidas = async (req, res) => {
 
         for (const escolaId of userEscolas) {
             const alunosEscola = await Aluno.getByEscolaId(escolaId);
+            // Processar dados dos alunos
+            const processedAlunosEscola = alunosEscola.map(processAlunoData);
             alunosEscolasAtribuidas.push({
                 id_escola: escolaId,
-                alunos: alunosEscola,
-                total_alunos_escola: alunosEscola.length
+                alunos: processedAlunosEscola,
+                total_alunos_escola: processedAlunosEscola.length
             });
-            totalAlunos += alunosEscola.length;
+            totalAlunos += processedAlunosEscola.length;
         }
 
         res.status(200).json({
@@ -192,7 +234,9 @@ exports.getAlunosEscolasAtribuidas = async (req, res) => {
 exports.getAlunosComDividas = async (req, res) => {
     try {
         const alunos = await Aluno.getAlunosComDividas();
-        res.status(200).json(alunos);
+        // Processar dados de todos os alunos
+        const processedAlunos = alunos.map(processAlunoData);
+        res.status(200).json(processedAlunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar alunos com dívidas" });
@@ -205,7 +249,7 @@ exports.getAlunoById = async (req, res) => {
         if (!aluno) {
             return res.status(404).json({ message: "Aluno não encontrado" });
         }
-        res.status(200).json(aluno);
+        res.status(200).json(processAlunoData(aluno));
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Erro ao buscar aluno" });
@@ -214,27 +258,156 @@ exports.getAlunoById = async (req, res) => {
 
 exports.updateAluno = async (req, res) => {
     try {
+        console.log("Update aluno request:", {
+            id: req.params.id,
+            body: req.body
+        });
+
+        // Validate input data
+        const validationErrors = validateAlunoData(req.body, true);
+        if (validationErrors.length > 0) {
+            console.log("Validation errors:", validationErrors);
+            return res.status(400).json({ 
+                message: "Dados inválidos", 
+                errors: validationErrors 
+            });
+        }
+
+        // Check if aluno exists
+        const existingAluno = await Aluno.getById(req.params.id);
+        if (!existingAluno) {
+            console.log("Aluno not found:", req.params.id);
+            return res.status(404).json({ 
+                message: "Aluno não encontrado" 
+            });
+        }
+
+        console.log("Existing aluno:", existingAluno);
+
+        // Check if numero_ficha already exists (excluding current aluno)
+        if (req.body.numero_ficha && req.body.numero_ficha !== existingAluno.numero_ficha) {
+            const existingFicha = await Aluno.getByNumeroFicha(req.body.numero_ficha);
+            if (existingFicha && existingFicha.id_aluno !== parseInt(req.params.id)) {
+                return res.status(409).json({ 
+                    message: "Número de ficha já existe no sistema" 
+                });
+            }
+        }
+
+        // Check if numero_identificacao already exists (excluding current aluno)
+        if (req.body.numero_identificacao && req.body.numero_identificacao !== existingAluno.numero_identificacao) {
+            const existingIdentificacao = await Aluno.getByNumeroIdentificacao(req.body.numero_identificacao);
+            if (existingIdentificacao && existingIdentificacao.id_aluno !== parseInt(req.params.id)) {
+                return res.status(409).json({ 
+                    message: "Número de identificação já existe no sistema" 
+                });
+            }
+        }
+
+        // Check if email already exists (excluding current aluno)
+        if (req.body.email && req.body.email !== existingAluno.email) {
+            const existingEmail = await Aluno.getByEmail(req.body.email);
+            if (existingEmail && existingEmail.id_aluno !== parseInt(req.params.id)) {
+                return res.status(409).json({ 
+                    message: "Email já existe no sistema" 
+                });
+            }
+        }
+
+        console.log("Updating aluno with data:", req.body);
         const affectedRows = await Aluno.update(req.params.id, req.body);
+        console.log("Affected rows:", affectedRows);
+        
         if (affectedRows === 0) {
             return res.status(404).json({ message: "Aluno não encontrado" });
         }
-        res.status(200).json({ message: "Aluno atualizado com sucesso" });
+        
+        // Return updated aluno data
+        const updatedAluno = await Aluno.getById(req.params.id);
+        console.log("Updated aluno:", updatedAluno);
+        
+        res.status(200).json({ 
+            message: "Aluno atualizado com sucesso",
+            aluno: processAlunoData(updatedAluno)
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erro ao atualizar aluno" });
+        console.error("Erro ao atualizar aluno:", error);
+        console.error("Error stack:", error.stack);
+        
+        // Handle specific database errors
+        if (error.code === 'ER_DUP_ENTRY') {
+            if (error.message.includes('numero_ficha')) {
+                return res.status(409).json({ message: "Número de ficha já existe no sistema" });
+            }
+            if (error.message.includes('numero_identificacao')) {
+                return res.status(409).json({ message: "Número de identificação já existe no sistema" });
+            }
+            if (error.message.includes('email')) {
+                return res.status(409).json({ message: "Email já existe no sistema" });
+            }
+        }
+        
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            return res.status(400).json({ message: "Escola não encontrada" });
+        }
+        
+        res.status(500).json({ 
+            message: "Erro interno do servidor ao atualizar aluno",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
 exports.deleteAluno = async (req, res) => {
     try {
+        // Check if aluno exists
+        const existingAluno = await Aluno.getById(req.params.id);
+        if (!existingAluno) {
+            return res.status(404).json({ 
+                message: "Aluno não encontrado" 
+            });
+        }
+
+        // Check if aluno has active enrollments (matriculas)
+        if (existingAluno.matriculas && existingAluno.matriculas.length > 0) {
+            const activeMatriculas = existingAluno.matriculas.filter(
+                matricula => matricula.status_matricula === 'Ativa' || matricula.status_matricula === 'Em andamento'
+            );
+            
+            if (activeMatriculas.length > 0) {
+                return res.status(400).json({ 
+                    message: "Não é possível excluir um aluno com matrículas ativas. Desative as matrículas primeiro." 
+                });
+            }
+        }
+
         const affectedRows = await Aluno.delete(req.params.id);
         if (affectedRows === 0) {
             return res.status(404).json({ message: "Aluno não encontrado" });
         }
-        res.status(200).json({ message: "Aluno deletado com sucesso" });
+        
+        res.status(200).json({ 
+            message: "Aluno deletado com sucesso",
+            deletedAluno: {
+                id_aluno: existingAluno.id_aluno,
+                nome_completo: existingAluno.nome_completo,
+                numero_ficha: existingAluno.numero_ficha
+            }
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erro ao deletar aluno" });
+        console.error("Erro ao deletar aluno:", error);
+        
+        // Handle foreign key constraint errors
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            return res.status(400).json({ 
+                message: "Não é possível excluir este aluno pois existem registros relacionados (matrículas, pagamentos, etc.)" 
+            });
+        }
+        
+        res.status(500).json({ 
+            message: "Erro interno do servidor ao deletar aluno",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
